@@ -13,8 +13,13 @@ const mapSpeakerToCharacter = (speaker: string): CharacterId | null => {
   }
 };
 
+const withoutSoftenCast = (stage: DuoStageState): Omit<DuoStageState, "softenCast"> => {
+  const { softenCast: _softenCast, ...stageWithoutSoftenCast } = stage;
+  return stageWithoutSoftenCast;
+};
+
 const dimBoth = (stage: DuoStageState): DuoStageState => ({
-  ...stage,
+  ...withoutSoftenCast(stage),
   left: { ...stage.left, light: "dim" },
   right: { ...stage.right, light: "dim" },
 });
@@ -35,7 +40,7 @@ const applyHighlight = (
   }
 
   return {
-    ...stage,
+    ...withoutSoftenCast(stage),
     left: { ...stage.left, light: leftLight },
     right: { ...stage.right, light: rightLight },
   };

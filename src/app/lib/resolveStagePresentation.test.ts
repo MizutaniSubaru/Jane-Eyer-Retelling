@@ -24,6 +24,7 @@ const thoughtAfterDialogue: SceneEntry = {
   atmosphere: { weather: "calm" },
   stage: {
     mode: "duo-stage",
+    softenCast: true,
     left: { character: "jane", mood: "neutral", light: "dim" },
     right: { character: "rochester", mood: "neutral", light: "dim" },
   },
@@ -37,6 +38,7 @@ const narrationAfterDialogue: SceneEntry = {
   atmosphere: { weather: "calm" },
   stage: {
     mode: "duo-stage",
+    softenCast: true,
     left: { character: "jane", mood: "neutral", light: "dim" },
     right: { character: "rochester", mood: "neutral", light: "dim" },
   },
@@ -66,6 +68,7 @@ describe("resolveStagePresentation", () => {
 
     expect(resolved.left.light).toBe("dim");
     expect(resolved.right.light).toBe("bright");
+    expect("softenCast" in resolved).toBe(false);
   });
 
   it("inherits the previous dialogue highlight for thought and narration beats", () => {
@@ -81,6 +84,7 @@ describe("resolveStagePresentation", () => {
 
     expect(resolved.left.light).toBe("dim");
     expect(resolved.right.light).toBe("bright");
+    expect("softenCast" in resolved).toBe(false);
   });
 
   it("inherits the immediately previous dialogue highlight for duo-stage narration", () => {
@@ -111,6 +115,7 @@ describe("resolveStagePresentation", () => {
 
     expect(resolved.left.light).toBe("dim");
     expect(resolved.right.light).toBe("dim");
+    expect("softenCast" in resolved).toBe(false);
   });
 
   it("falls back to both portraits dim when no prior dialogue highlight exists", () => {
@@ -138,5 +143,14 @@ describe("resolveStagePresentation", () => {
     expect(resolveStagePresentation([narrationOnlyEntry], 0)).toEqual({
       mode: "narration-only",
     });
+  });
+
+  it("throws when current index is invalid", () => {
+    expect(() => resolveStagePresentation([rochesterDialogueStage], -1)).toThrow(
+      RangeError,
+    );
+    expect(() => resolveStagePresentation([rochesterDialogueStage], 1)).toThrow(
+      RangeError,
+    );
   });
 });
