@@ -29,6 +29,32 @@ const thoughtAfterDialogue: SceneEntry = {
   },
 };
 
+const narrationAfterDialogue: SceneEntry = {
+  id: "narration-after-dialogue",
+  type: "narration",
+  speaker: "旁白",
+  text: "空气沉静下来，仿佛所有声音都在等待下一句话。",
+  atmosphere: { weather: "calm" },
+  stage: {
+    mode: "duo-stage",
+    left: { character: "jane", mood: "neutral", light: "dim" },
+    right: { character: "rochester", mood: "neutral", light: "dim" },
+  },
+};
+
+const unmappedDialogueStage: SceneEntry = {
+  id: "mrs-fairfax-speaks",
+  type: "dialogue",
+  speaker: "费尔法克斯太太",
+  text: "晚餐已经准备好了。",
+  atmosphere: { weather: "calm" },
+  stage: {
+    mode: "duo-stage",
+    left: { character: "jane", mood: "neutral", light: "dim" },
+    right: { character: "rochester", mood: "neutral", light: "dim" },
+  },
+};
+
 describe("resolveStagePresentation", () => {
   it("brightens the current dialogue speaker", () => {
     const resolved = resolveStagePresentation([rochesterDialogueStage], 0);
@@ -55,6 +81,36 @@ describe("resolveStagePresentation", () => {
 
     expect(resolved.left.light).toBe("dim");
     expect(resolved.right.light).toBe("bright");
+  });
+
+  it("inherits the immediately previous dialogue highlight for duo-stage narration", () => {
+    const resolved = resolveStagePresentation(
+      [rochesterDialogueStage, narrationAfterDialogue],
+      1,
+    );
+
+    expect(resolved.mode).toBe("duo-stage");
+    if (resolved.mode !== "duo-stage") {
+      throw new Error("Expected a duo-stage result.");
+    }
+
+    expect(resolved.left.light).toBe("dim");
+    expect(resolved.right.light).toBe("bright");
+  });
+
+  it("falls back to both dim when the nearest prior duo-stage dialogue speaker is unmapped", () => {
+    const resolved = resolveStagePresentation(
+      [rochesterDialogueStage, unmappedDialogueStage, thoughtAfterDialogue],
+      2,
+    );
+
+    expect(resolved.mode).toBe("duo-stage");
+    if (resolved.mode !== "duo-stage") {
+      throw new Error("Expected a duo-stage result.");
+    }
+
+    expect(resolved.left.light).toBe("dim");
+    expect(resolved.right.light).toBe("dim");
   });
 
   it("falls back to both portraits dim when no prior dialogue highlight exists", () => {

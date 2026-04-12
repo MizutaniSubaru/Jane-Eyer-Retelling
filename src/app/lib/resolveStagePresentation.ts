@@ -55,10 +55,7 @@ const findPreviousDialogueSpeaker = (
       continue;
     }
 
-    const mapped = mapSpeakerToCharacter(candidate.speaker);
-    if (mapped !== null) {
-      return mapped;
-    }
+    return mapSpeakerToCharacter(candidate.speaker);
   }
 
   return null;
