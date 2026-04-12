@@ -23,7 +23,7 @@ describe("CharacterStage", () => {
     expect(screen.getByTestId("portrait-rochester")).toHaveAttribute("data-light", "dim");
   });
 
-  it("renders dim portraits as grayscale from the bright base art", () => {
+  it("renders dim portraits as softened color from the bright base art", () => {
     render(
       <CharacterStage
         stage={{
@@ -38,8 +38,30 @@ describe("CharacterStage", () => {
       "src",
       expect.stringMatching(/jane-bright-neutral\.png$/),
     );
-    expect(screen.getByTestId("portrait-jane")).toHaveClass("grayscale");
+    expect(screen.getByTestId("portrait-jane")).toHaveClass(
+      "brightness-[0.72]",
+      "saturate-[0.74]",
+    );
+    expect(screen.getByTestId("portrait-jane")).not.toHaveClass("grayscale");
     expect(screen.getByTestId("portrait-jane")).not.toHaveClass("opacity-65");
+  });
+
+  it("renders the speaking portrait with a brighter, richer color treatment", () => {
+    render(
+      <CharacterStage
+        stage={{
+          mode: "duo-stage",
+          left: { character: "jane", mood: "neutral", light: "bright" },
+          right: { character: "rochester", mood: "neutral", light: "dim" },
+        }}
+      />,
+    );
+
+    expect(screen.getByTestId("portrait-jane")).toHaveClass(
+      "brightness-[1.08]",
+      "saturate-[1.08]",
+    );
+    expect(screen.getByTestId("portrait-jane")).not.toHaveClass("grayscale");
   });
 
   it("renders the stage as a fixed full-scene layer", () => {
