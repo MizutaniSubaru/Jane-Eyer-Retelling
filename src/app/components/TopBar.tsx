@@ -1,7 +1,15 @@
 import { motion } from "motion/react";
 import { ArrowLeft, X, Settings2, Volume2, BookOpen } from "lucide-react";
 
-export function TopBar({ onBack, progress }: { onBack: () => void; progress: number }) {
+export function TopBar({
+  onBack,
+  progress,
+  chapterLabel,
+}: {
+  onBack: () => void;
+  progress: number;
+  chapterLabel: string;
+}) {
   return (
     <div className="w-full px-8 py-6 flex items-center justify-between text-[#a3b5c6]/80 font-serif">
       {/* Left Actions */}
@@ -22,7 +30,7 @@ export function TopBar({ onBack, progress }: { onBack: () => void; progress: num
       <div className="flex flex-col items-center flex-1 mx-16 max-w-sm">
         <div className="flex items-center gap-4 text-xs tracking-[0.2em] mb-3 text-[#a3b5c6]/60">
           <BookOpen size={14} strokeWidth={1} />
-          <span>章一 · 仲夏夜之秘</span>
+          <span>{chapterLabel}</span>
         </div>
         <div className="w-full h-[1px] bg-[#a3b5c6]/20 relative overflow-hidden rounded-full">
           <motion.div

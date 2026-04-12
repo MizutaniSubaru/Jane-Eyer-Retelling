@@ -42,11 +42,11 @@ describe("DialogueBox", () => {
     renderDialogueBox({
       entryType: "chapter-card",
       speaker: "旁白",
-      text: "第二十三章",
+      text: "第二十三章\n果园之夜",
     });
 
     expect(screen.queryByText("旁白")).not.toBeInTheDocument();
-    expect(screen.getByText("第二十三章")).toBeInTheDocument();
+    expect(screen.getByText(/第二十三章/)).toHaveClass("whitespace-pre-line");
   });
 
   it("renders thought text on the distinct styling branch", () => {

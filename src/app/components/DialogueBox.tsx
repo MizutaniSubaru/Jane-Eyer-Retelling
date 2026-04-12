@@ -88,7 +88,7 @@ export function DialogueBox({
             transition={{ duration: 0.9, delay: 0.1, ease: "easeOut" }}
             className={`font-serif tracking-wide ${
               isChapterCard
-                ? "max-w-3xl text-3xl leading-snug md:text-4xl"
+                ? "max-w-3xl whitespace-pre-line text-3xl leading-snug md:text-4xl"
                 : isThought
                   ? "text-xl italic leading-loose text-[#efe4f0] md:text-[22px]"
                   : isNarration

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { motion } from "motion/react";
+
+import { chapter23Meta } from "../data/chapter23Scene";
 import bgImg from "../../imports/4164942f3bb1b952ba1877846b4d95a5.png";
 import { DesignNotes } from "./DesignNotes";
 
@@ -43,7 +45,7 @@ export function StartScreen({ onStart }: { onStart: () => void }) {
             className="text-xl md:text-2xl tracking-[0.3em] text-[#a3b5c6] uppercase font-light"
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
           >
-            Chapter One · The Orchard
+            {chapter23Meta.chapterLabel} · 果园之夜
           </h2>
         </motion.div>
 
