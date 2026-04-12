@@ -59,32 +59,26 @@ describe("DialogueBox", () => {
     expect(screen.getByText("若是现在离开，我会后悔一生。")).toHaveClass("italic");
   });
 
-  it("keeps speaker text and navigation controls for narration and dialogue", () => {
-    const { rerender } = renderDialogueBox({
+  it("suppresses the narration label while keeping content and navigation visible", () => {
+    renderDialogueBox({
       entryType: "narration",
       speaker: "旁白",
       text: "夜风吹过果树，树影在石径上缓缓移动。",
     });
 
-    expect(screen.getByText("旁白")).toBeInTheDocument();
+    expect(screen.queryByText("旁白")).not.toBeInTheDocument();
+    expect(screen.getByText("夜风吹过果树，树影在石径上缓缓移动。")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /上一句/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /下一句/i })).toBeInTheDocument();
+  });
 
-    rerender(
-      <DialogueBox
-        entryType="dialogue"
-        speaker="罗切斯特"
-        text="简，留下来。"
-        onNext={vi.fn()}
-        onPrev={vi.fn()}
-        canNext
-        canPrev
-        isChoiceState={false}
-      />,
-    );
+  it("still renders a dialogue speaker label for spoken lines", () => {
+    renderDialogueBox({
+      entryType: "dialogue",
+      speaker: "罗切斯特",
+      text: "简，留下来。",
+    });
 
     expect(screen.getByText("罗切斯特")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /上一句/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /下一句/i })).toBeInTheDocument();
   });
 });
