@@ -25,9 +25,9 @@ acceptsStage({
   left: { character: "jane", mood: "neutral", light: "bright" },
 } as const);
 
-// @ts-expect-error Duo-stage stages no longer support softenCast.
 acceptsStage({
   mode: "duo-stage",
+  // @ts-expect-error Duo-stage stages no longer support softenCast.
   softenCast: true,
   left: { character: "jane", mood: "neutral", light: "dim" },
   right: { character: "rochester", mood: "neutral", light: "dim" },
