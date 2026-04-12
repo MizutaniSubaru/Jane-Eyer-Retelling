@@ -23,7 +23,6 @@ function duoStage(
 ): DuoStageState {
   return {
     mode: "duo-stage",
-    softenCast: active === "none" ? true : undefined,
     left: {
       character: "jane",
       mood: janeMood,

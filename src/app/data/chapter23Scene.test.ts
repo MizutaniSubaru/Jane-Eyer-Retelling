@@ -25,10 +25,12 @@ acceptsStage({
   left: { character: "jane", mood: "neutral", light: "bright" },
 } as const);
 
-// @ts-expect-error Narration-only stages must not carry duo-stage-only softening or portrait slots.
+// @ts-expect-error Duo-stage stages no longer support softenCast.
 acceptsStage({
-  mode: "narration-only",
+  mode: "duo-stage",
   softenCast: true,
+  left: { character: "jane", mood: "neutral", light: "dim" },
+  right: { character: "rochester", mood: "neutral", light: "dim" },
 } as const);
 
 // @ts-expect-error Duo-stage entries must define both left and right portrait slots.
@@ -73,14 +75,11 @@ describe("chapter23Scene", () => {
     }
   });
 
-  it("includes at least one subdued cast beat for narration or thought", () => {
+  it("does not include legacy softenCast flags in duo-stage entries", () => {
     expect(
-      chapter23Scene.some(
-        (entry) =>
-          (entry.type === "narration" || entry.type === "thought") &&
-          entry.stage.mode === "duo-stage" &&
-          entry.stage.softenCast === true,
-      ),
+      chapter23Scene
+        .filter((entry) => entry.stage.mode === "duo-stage")
+        .every((entry) => !("softenCast" in entry.stage)),
     ).toBe(true);
   });
 

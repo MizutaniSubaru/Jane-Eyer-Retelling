@@ -43,13 +43,16 @@ describe("CharacterStage", () => {
   });
 
   it("does not apply the old softened opacity treatment", () => {
+    const legacySoftenStage = {
+      mode: "duo-stage",
+      softenCast: true,
+      left: { character: "jane", mood: "neutral", light: "dim" },
+      right: { character: "rochester", mood: "warm", light: "bright" },
+    } as const;
+
     render(
       <CharacterStage
-        stage={{
-          mode: "duo-stage",
-          left: { character: "jane", mood: "neutral", light: "dim" },
-          right: { character: "rochester", mood: "warm", light: "bright" },
-        }}
+        stage={legacySoftenStage as unknown as Parameters<typeof CharacterStage>[0]["stage"]}
       />,
     );
 
