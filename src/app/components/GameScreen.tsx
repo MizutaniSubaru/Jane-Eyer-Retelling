@@ -59,14 +59,15 @@ export function GameScreen({ onBack }: { onBack: () => void }) {
         <TopBar
           onBack={onBack}
           progress={progress}
-          chapterLabel={chapter23Meta.progressLabel}
+          chapterLabel={chapter23Meta.title}
         />
       </motion.div>
 
       {/* Portrait Stage */}
       <div
         data-testid="game-stage-layer"
-        className="absolute inset-0 z-10 px-4 pt-24 pointer-events-none md:pt-28"
+        onClick={handleNext}
+        className="absolute inset-0 z-10 cursor-pointer px-4 pt-24 md:pt-28"
       >
         <CharacterStage stage={resolvedStage} />
       </div>
@@ -114,6 +115,7 @@ export function GameScreen({ onBack }: { onBack: () => void }) {
       {/* Bottom Dialogue Overlay */}
       <div
         data-testid="game-dialogue-layer"
+        onClick={handleNext}
         className="absolute inset-x-0 bottom-0 z-20 px-4 pb-8 sm:px-6 md:px-8 md:pb-10"
       >
         <div className="mx-auto w-full max-w-5xl">

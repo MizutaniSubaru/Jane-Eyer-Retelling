@@ -12,9 +12,9 @@ describe("GameScreen", () => {
     render(<GameScreen onBack={vi.fn()} />);
 
     expect(screen.getByText(/第二十三章/)).toBeInTheDocument();
-    expect(screen.getByText(/果园之夜/)).toBeInTheDocument();
+    expect(screen.getAllByText(/果园之夜/).length).toBeGreaterThan(1);
 
-    fireEvent.click(screen.getByRole("button", { name: /下一句/i }));
+    fireEvent.click(screen.getByTestId("dialogue-box"));
 
     expect(screen.getByText(/这个仲夏的英格兰格外明亮/)).toBeInTheDocument();
     expect(
@@ -44,17 +44,15 @@ describe("GameScreen", () => {
   it("keeps the previous dialogue highlight during subsequent thought beats", () => {
     render(<GameScreen onBack={vi.fn()} />);
 
-    const nextButton = screen.getByRole("button", { name: /下一句/i });
-
     for (let step = 0; step < 13; step += 1) {
-      fireEvent.click(nextButton);
+      fireEvent.click(screen.getByTestId("dialogue-box"));
     }
 
     expect(screen.getByText("简，过来看看这家伙。")).toBeInTheDocument();
     expect(screen.getByTestId("portrait-jane")).toHaveAttribute("data-light", "dim");
     expect(screen.getByTestId("portrait-rochester")).toHaveAttribute("data-light", "bright");
 
-    fireEvent.click(nextButton);
+    fireEvent.click(screen.getByTestId("game-stage-layer"));
 
     expect(screen.getByText(/我明明没有出声，他怎么还是知道我在这里？/)).toBeInTheDocument();
     expect(screen.getByTestId("portrait-jane")).toHaveAttribute("data-light", "dim");

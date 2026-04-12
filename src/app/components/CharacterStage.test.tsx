@@ -39,8 +39,8 @@ describe("CharacterStage", () => {
       expect.stringMatching(/jane-bright-neutral\.png$/),
     );
     expect(screen.getByTestId("portrait-jane")).toHaveClass(
-      "brightness-[0.72]",
-      "saturate-[0.74]",
+      "brightness-[0.74]",
+      "saturate-[0.82]",
     );
     expect(screen.getByTestId("portrait-jane")).not.toHaveClass("grayscale");
     expect(screen.getByTestId("portrait-jane")).not.toHaveClass("opacity-65");
@@ -59,9 +59,28 @@ describe("CharacterStage", () => {
 
     expect(screen.getByTestId("portrait-jane")).toHaveClass(
       "brightness-[1.08]",
-      "saturate-[1.08]",
+      "saturate-[1.06]",
     );
     expect(screen.getByTestId("portrait-jane")).not.toHaveClass("grayscale");
+  });
+
+  it("keeps Rochester on a warmer color grade than Jane", () => {
+    render(
+      <CharacterStage
+        stage={{
+          mode: "duo-stage",
+          left: { character: "jane", mood: "neutral", light: "bright" },
+          right: { character: "rochester", mood: "neutral", light: "dim" },
+        }}
+      />,
+    );
+
+    expect(screen.getByTestId("portrait-rochester")).toHaveClass(
+      "brightness-[0.68]",
+      "saturate-[0.76]",
+      "sepia-[0.08]",
+    );
+    expect(screen.getByTestId("portrait-jane")).not.toHaveClass("sepia-[0.08]");
   });
 
   it("renders the stage as a fixed full-scene layer", () => {
