@@ -11,25 +11,34 @@ import rochesterBrightSad from "../../assets/portraits/rochester-bright-sad.png"
 import rochesterDimAngry from "../../assets/portraits/rochester-dim-angry.png";
 import rochesterDimNeutral from "../../assets/portraits/rochester-dim-neutral.png";
 import rochesterDimSad from "../../assets/portraits/rochester-dim-sad.png";
-
-type CharacterId = "jane" | "rochester";
-type PortraitMood = "neutral" | "sad" | "angry" | "warm";
-type PortraitLight = "bright" | "dim";
+import type {
+  CharacterId,
+  PortraitLight,
+  PortraitMood,
+} from "../types/story";
 
 const portraitManifest = {
   jane: {
     neutral: { bright: janeBrightNeutral, dim: janeDimNeutral },
     sad: { bright: janeBrightSad, dim: janeDimSad },
-    angry: { bright: janeBrightAngry, dim: janeDimNeutral },
+    angry: {
+      bright: janeBrightAngry,
+      // Intentional alias: there is no dedicated Jane dim-angry portrait yet.
+      dim: janeDimNeutral,
+    },
     warm: { bright: janeBrightWarm, dim: janeDimWarm },
   },
   rochester: {
     neutral: { bright: rochesterBrightNeutral, dim: rochesterDimNeutral },
     sad: { bright: rochesterBrightSad, dim: rochesterDimSad },
     angry: { bright: rochesterBrightAngry, dim: rochesterDimAngry },
-    warm: { bright: rochesterBrightNeutral, dim: rochesterDimNeutral },
+    warm: {
+      // Intentional aliases: Rochester warm currently reuses the neutral portraits.
+      bright: rochesterBrightNeutral,
+      dim: rochesterDimNeutral,
+    },
   },
-} as const;
+} satisfies Record<CharacterId, Record<PortraitMood, Record<PortraitLight, string>>>;
 
 export function getPortraitAsset(
   character: CharacterId,
