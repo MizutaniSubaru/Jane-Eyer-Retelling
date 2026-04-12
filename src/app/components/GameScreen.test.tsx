@@ -25,11 +25,14 @@ describe("GameScreen", () => {
   it("renders the portrait stage and dialogue box as absolute overlays", () => {
     render(<GameScreen onBack={vi.fn()} />);
 
-    expect(screen.getByTestId("game-stage-layer")).toHaveClass(
+    const stageLayer = screen.getByTestId("game-stage-layer");
+
+    expect(stageLayer).toHaveClass(
       "absolute",
       "inset-0",
       "z-10",
     );
+    expect(stageLayer.className).not.toMatch(/(?:^|\s)(?:[a-z]+:)?pb-\S+/);
     expect(screen.getByTestId("game-dialogue-layer")).toHaveClass(
       "absolute",
       "inset-x-0",

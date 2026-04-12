@@ -47,11 +47,12 @@ const findPreviousDialogueSpeaker = (
 ): CharacterId | null => {
   for (let i = currentIndex - 1; i >= 0; i -= 1) {
     const candidate = entries[i];
-    if (candidate.type !== "dialogue") {
-      continue;
-    }
 
     if (candidate.stage.mode !== "duo-stage") {
+      return null;
+    }
+
+    if (candidate.type !== "dialogue") {
       continue;
     }
 

@@ -66,7 +66,7 @@ export function GameScreen({ onBack }: { onBack: () => void }) {
       {/* Portrait Stage */}
       <div
         data-testid="game-stage-layer"
-        className="absolute inset-0 z-10 px-4 pt-24 pb-28 pointer-events-none md:pt-28 md:pb-32 lg:pb-36"
+        className="absolute inset-0 z-10 px-4 pt-24 pointer-events-none md:pt-28"
       >
         <CharacterStage stage={resolvedStage} />
       </div>

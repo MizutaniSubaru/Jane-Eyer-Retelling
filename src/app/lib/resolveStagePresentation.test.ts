@@ -113,6 +113,30 @@ describe("resolveStagePresentation", () => {
     expect(resolved.right.light).toBe("dim");
   });
 
+  it("stops highlight inheritance when a non-duo-stage beat breaks the stage sequence", () => {
+    const narrationOnlyBreak: SceneEntry = {
+      id: "garden-break",
+      type: "narration",
+      speaker: "旁白",
+      text: "风声穿过树梢，舞台上的人像暂时退去。",
+      atmosphere: { weather: "calm" },
+      stage: { mode: "narration-only" },
+    };
+
+    const resolved = resolveStagePresentation(
+      [rochesterDialogueStage, narrationOnlyBreak, thoughtAfterDialogue],
+      2,
+    );
+
+    expect(resolved.mode).toBe("duo-stage");
+    if (resolved.mode !== "duo-stage") {
+      throw new Error("Expected a duo-stage result.");
+    }
+
+    expect(resolved.left.light).toBe("dim");
+    expect(resolved.right.light).toBe("dim");
+  });
+
   it("falls back to both portraits dim when no prior dialogue highlight exists", () => {
     const resolved = resolveStagePresentation([thoughtAfterDialogue], 0);
 
