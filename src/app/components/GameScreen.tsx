@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
 import { chapter23Meta, chapter23Scene } from "../data/chapter23Scene";
+import { resolveStagePresentation } from "../lib/resolveStagePresentation";
 import { formatEntryText } from "../lib/storyText";
 import { CharacterStage } from "./CharacterStage";
 import { TopBar } from "./TopBar";
@@ -11,6 +12,7 @@ import bgImg from "../../imports/4164942f3bb1b952ba1877846b4d95a5.png";
 export function GameScreen({ onBack }: { onBack: () => void }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentEntry = chapter23Scene[currentIndex];
+  const resolvedStage = resolveStagePresentation(chapter23Scene, currentIndex);
   const progress = (currentIndex / (chapter23Scene.length - 1)) * 100;
 
   const handleNext = () => {
@@ -31,7 +33,7 @@ export function GameScreen({ onBack }: { onBack: () => void }) {
       : formatEntryText(currentEntry);
 
   return (
-    <div className="w-full h-full relative flex flex-col justify-between overflow-hidden bg-[#1f1b24]">
+    <div className="relative h-full w-full overflow-hidden bg-[#1f1b24]">
       {/* Background with slow subtle parallax */}
       <motion.div
         key="game-bg"
@@ -47,73 +49,79 @@ export function GameScreen({ onBack }: { onBack: () => void }) {
         <div className="absolute inset-0 bg-gradient-to-t from-[#1f1b24] via-transparent to-transparent" />
       </motion.div>
 
-      {/* Main Container */}
-      <div className="relative z-10 w-full h-full flex flex-col">
-        {/* Top Control Bar */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.5 }}
-        >
-          <TopBar
-            onBack={onBack}
-            progress={progress}
-            chapterLabel={chapter23Meta.progressLabel}
-          />
-        </motion.div>
+      {/* Top Control Bar */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1, delay: 0.5 }}
+        className="relative z-30"
+      >
+        <TopBar
+          onBack={onBack}
+          progress={progress}
+          chapterLabel={chapter23Meta.progressLabel}
+        />
+      </motion.div>
 
-        {/* Weather / Emotion Overlay */}
-        <div className="absolute inset-0 z-0 pointer-events-none mix-blend-overlay">
-          <AnimatePresence>
-            {(currentEntry.atmosphere.weather === "tense" ||
-              currentEntry.atmosphere.weather === "storm") && (
-              <motion.div
-                key="storm-ambient"
-                initial={{ opacity: 0, backgroundColor: "rgba(163, 181, 198, 0)" }}
-                animate={{
-                  opacity: currentEntry.atmosphere.weather === "storm" ? 0.3 : 0.16,
-                  backgroundColor:
-                    currentEntry.atmosphere.weather === "storm"
-                      ? [
-                          "rgba(163, 181, 198, 0.2)",
-                          "rgba(163, 181, 198, 0.38)",
-                          "rgba(163, 181, 198, 0.2)",
-                        ]
-                      : [
-                          "rgba(122, 137, 159, 0.08)",
-                          "rgba(122, 137, 159, 0.16)",
-                          "rgba(122, 137, 159, 0.08)",
-                        ],
-                }}
-                transition={{ duration: 5, ease: "easeInOut", repeat: Infinity }}
-                className="absolute inset-0"
-              />
-            )}
+      {/* Portrait Stage */}
+      <div
+        data-testid="game-stage-layer"
+        className="absolute inset-0 z-10 px-4 pt-24 pointer-events-none md:pt-28"
+      >
+        <CharacterStage stage={resolvedStage} />
+      </div>
 
-            {currentEntry.atmosphere.weather === "storm" && (
-              <motion.div
-                key="lightning-flash"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 0.15, 0] }}
-                transition={{ duration: 0.4, delay: 0.5, ease: "easeOut" }}
-                className="absolute inset-0 bg-white"
-              />
-            )}
-          </AnimatePresence>
-        </div>
+      {/* Weather / Emotion Overlay */}
+      <div className="absolute inset-0 z-[15] pointer-events-none mix-blend-overlay">
+        <AnimatePresence>
+          {(currentEntry.atmosphere.weather === "tense" ||
+            currentEntry.atmosphere.weather === "storm") && (
+            <motion.div
+              key="storm-ambient"
+              initial={{ opacity: 0, backgroundColor: "rgba(163, 181, 198, 0)" }}
+              animate={{
+                opacity: currentEntry.atmosphere.weather === "storm" ? 0.3 : 0.16,
+                backgroundColor:
+                  currentEntry.atmosphere.weather === "storm"
+                    ? [
+                        "rgba(163, 181, 198, 0.2)",
+                        "rgba(163, 181, 198, 0.38)",
+                        "rgba(163, 181, 198, 0.2)",
+                      ]
+                    : [
+                        "rgba(122, 137, 159, 0.08)",
+                        "rgba(122, 137, 159, 0.16)",
+                        "rgba(122, 137, 159, 0.08)",
+                      ],
+              }}
+              transition={{ duration: 5, ease: "easeInOut", repeat: Infinity }}
+              className="absolute inset-0"
+            />
+          )}
 
-        {/* Central Display Area for Characters/Stage (Using abstract subtle lighting) */}
-        <div className="flex-1 flex items-center justify-center relative w-full px-4 pointer-events-none">
-          <CharacterStage stage={currentEntry.stage} />
-        </div>
+          {currentEntry.atmosphere.weather === "storm" && (
+            <motion.div
+              key="lightning-flash"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 0.15, 0] }}
+              transition={{ duration: 0.4, delay: 0.5, ease: "easeOut" }}
+              className="absolute inset-0 bg-white"
+            />
+          )}
+        </AnimatePresence>
+      </div>
 
-        {/* Bottom Area: Dialogue and Choices */}
-        <div className="relative w-full max-w-5xl mx-auto px-8 pb-12 flex flex-col justify-end">
+      {/* Bottom Dialogue Overlay */}
+      <div
+        data-testid="game-dialogue-layer"
+        className="absolute inset-x-0 bottom-0 z-20 px-4 pb-8 sm:px-6 md:px-8 md:pb-10"
+      >
+        <div className="mx-auto w-full max-w-5xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.8 }}
-            className="w-full mt-6"
+            className="w-full"
           >
             <DialogueBox
               entryType={currentEntry.type}

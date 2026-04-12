@@ -16,21 +16,18 @@ export type StageSlot = {
 
 export type CardStageState = {
   mode: "card";
-  softenCast?: never;
   left?: never;
   right?: never;
 };
 
 export type NarrationOnlyStageState = {
   mode: "narration-only";
-  softenCast?: never;
   left?: never;
   right?: never;
 };
 
 export type DuoStageState = {
   mode: "duo-stage";
-  softenCast?: boolean;
   left: StageSlot;
   right: StageSlot;
 };

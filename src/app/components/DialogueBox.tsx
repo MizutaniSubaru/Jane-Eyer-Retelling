@@ -25,7 +25,7 @@ export function DialogueBox({
   const isChapterCard = entryType === "chapter-card";
   const isThought = entryType === "thought";
   const isNarration = entryType === "narration";
-  const showSpeaker = !isChapterCard && speaker.trim().length > 0;
+  const showSpeaker = !isChapterCard && !isNarration && speaker.trim().length > 0;
 
   return (
     <div
