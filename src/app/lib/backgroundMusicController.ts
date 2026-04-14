@@ -10,12 +10,18 @@ function clampVolume(volume: number) {
 
 export function createBackgroundMusicController(audio: HTMLAudioElement) {
   let fadeTimer: number | null = null;
+  let pendingPlaybackRetryCleanup: (() => void) | null = null;
 
   const clearFade = () => {
     if (fadeTimer !== null) {
       window.clearInterval(fadeTimer);
       fadeTimer = null;
     }
+  };
+
+  const clearPendingPlaybackRetry = () => {
+    pendingPlaybackRetryCleanup?.();
+    pendingPlaybackRetryCleanup = null;
   };
 
   const fadeVolume = (
@@ -46,18 +52,54 @@ export function createBackgroundMusicController(audio: HTMLAudioElement) {
     }, FADE_STEP_MS);
   };
 
+  const armPlaybackRetry = () => {
+    if (pendingPlaybackRetryCleanup !== null) {
+      return;
+    }
+
+    const retryPlayback = () => {
+      clearPendingPlaybackRetry();
+      void startFadeInPlayback();
+    };
+
+    const playbackRetryEvents = ["click", "keydown", "pointerdown", "touchstart"] as const;
+
+    playbackRetryEvents.forEach((eventName) => {
+      window.addEventListener(eventName, retryPlayback, { once: true });
+    });
+
+    pendingPlaybackRetryCleanup = () => {
+      playbackRetryEvents.forEach((eventName) => {
+        window.removeEventListener(eventName, retryPlayback);
+      });
+    };
+  };
+
+  const startFadeInPlayback = async () => {
+    clearFade();
+    clearPendingPlaybackRetry();
+    audio.loop = true;
+    audio.currentTime = 0;
+    audio.volume = 0;
+
+    try {
+      await audio.play();
+    } catch {
+      armPlaybackRetry();
+      return;
+    }
+
+    fadeVolume(0, BGM_TARGET_VOLUME, BGM_FADE_IN_MS);
+  };
+
   return {
     playFromStartWithFadeIn() {
-      clearFade();
-      audio.loop = true;
-      audio.currentTime = 0;
-      audio.volume = 0;
-      void audio.play().catch(() => undefined);
-      fadeVolume(0, BGM_TARGET_VOLUME, BGM_FADE_IN_MS);
+      void startFadeInPlayback();
     },
 
     stopWithFadeOut() {
       clearFade();
+      clearPendingPlaybackRetry();
       audio.loop = false;
 
       fadeVolume(audio.volume, 0, BGM_FADE_OUT_MS, () => {
@@ -67,6 +109,7 @@ export function createBackgroundMusicController(audio: HTMLAudioElement) {
     },
 
     dispose() {
+      clearPendingPlaybackRetry();
       clearFade();
       audio.pause();
     },

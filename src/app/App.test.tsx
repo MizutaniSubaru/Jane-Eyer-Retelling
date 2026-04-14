@@ -49,17 +49,19 @@ type MockAudioInstance = {
 };
 
 const audioInstances: MockAudioInstance[] = [];
+let createPlayMock: () => ReturnType<typeof vi.fn>;
 
 describe("App", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     audioInstances.length = 0;
+    createPlayMock = () => vi.fn().mockResolvedValue(undefined);
 
     class MockAudio {
       currentTime = 0;
       loop = false;
       pause = vi.fn(() => undefined);
-      play = vi.fn().mockResolvedValue(undefined);
+      play = createPlayMock();
       preload = "";
       src: string;
       volume = 1;
@@ -80,8 +82,10 @@ describe("App", () => {
     vi.unstubAllGlobals();
   });
 
-  it("starts music on the opening screen and restarts the fade-in after returning home", () => {
+  it("starts music on the opening screen and restarts the fade-in after returning home", async () => {
     render(<App />);
+
+    await act(async () => {});
 
     expect(audioInstances).toHaveLength(1);
     expect(audioInstances[0].play).toHaveBeenCalledTimes(1);
@@ -98,10 +102,12 @@ describe("App", () => {
     expect(screen.getByRole("button", { name: "开始叙事" })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "开始叙事" }));
+    await act(async () => {});
 
     expect(audioInstances[0].play).toHaveBeenCalledTimes(1);
 
     fireEvent.click(screen.getByRole("button", { name: "返回扉页" }));
+    await act(async () => {});
 
     expect(audioInstances[0].play).toHaveBeenCalledTimes(2);
     expect(audioInstances[0].currentTime).toBe(0);
@@ -114,8 +120,40 @@ describe("App", () => {
     expect(audioInstances[0].volume).toBeCloseTo(BGM_TARGET_VOLUME, 2);
   });
 
-  it("fades the music out and stops playback when the story reaches its ending", () => {
+  it("retries playback on the first user interaction if the browser blocks initial autoplay", async () => {
+    createPlayMock = () =>
+      vi
+        .fn()
+        .mockRejectedValueOnce(new Error("NotAllowedError"))
+        .mockResolvedValue(undefined);
+
     render(<App />);
+    await act(async () => {});
+
+    expect(audioInstances).toHaveLength(1);
+    expect(audioInstances[0].play).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      vi.advanceTimersByTime(BGM_FADE_IN_MS);
+    });
+
+    expect(audioInstances[0].volume).toBe(0);
+
+    fireEvent.click(window);
+    await act(async () => {});
+
+    expect(audioInstances[0].play).toHaveBeenCalledTimes(2);
+
+    act(() => {
+      vi.advanceTimersByTime(BGM_FADE_IN_MS);
+    });
+
+    expect(audioInstances[0].volume).toBeCloseTo(BGM_TARGET_VOLUME, 2);
+  });
+
+  it("fades the music out and stops playback when the story reaches its ending", async () => {
+    render(<App />);
+    await act(async () => {});
 
     expect(audioInstances).toHaveLength(1);
 
@@ -125,6 +163,7 @@ describe("App", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "开始叙事" }));
     fireEvent.click(screen.getByRole("button", { name: "结束剧情" }));
+    await act(async () => {});
 
     expect(audioInstances[0].loop).toBe(false);
 
