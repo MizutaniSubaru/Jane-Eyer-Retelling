@@ -22,6 +22,10 @@ ASSETS = {
     "rochester-dim-angry": "f61f3c8089de105065df85a67928084d.jpg",
 }
 
+EXTRA_ASSETS = {
+    "rochester-back": ROOT / "fcbd07990e282c247907af0d4b9befa2.jpg",
+}
+
 
 def is_background(r: int, g: int, b: int) -> bool:
     return max(r, g, b) < 18 or min(r, g, b) > 245
@@ -42,6 +46,8 @@ def main() -> None:
     TARGET.mkdir(parents=True, exist_ok=True)
     for name, filename in ASSETS.items():
         convert_to_png(SOURCE / filename, TARGET / f"{name}.png")
+    for name, source_path in EXTRA_ASSETS.items():
+        convert_to_png(source_path, TARGET / f"{name}.png")
 
 
 if __name__ == "__main__":

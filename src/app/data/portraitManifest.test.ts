@@ -46,4 +46,19 @@ describe("getPortraitAsset", () => {
       expect.stringMatching(/rochester-dim-neutral\.png$/),
     );
   });
+
+  it("resolves Rochester's back variant to the dedicated cutout asset", () => {
+    expect(
+      getPortraitAsset("rochester", "neutral", "dim", "back" as never),
+    ).toMatch(/rochester-back\.png$/);
+    expect(
+      getPortraitAsset("rochester", "neutral", "bright", "back" as never),
+    ).toMatch(/rochester-back\.png$/);
+  });
+
+  it("keeps Rochester's default variant on the existing front-facing manifest", () => {
+    expect(
+      getPortraitAsset("rochester", "neutral", "bright", "default" as never),
+    ).toMatch(/rochester-bright-neutral\.png$/);
+  });
 });

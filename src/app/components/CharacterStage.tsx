@@ -60,7 +60,12 @@ function Portrait({ slot, align, sceneKey = "static" }: PortraitProps) {
     return null;
   }
 
-  const src = getPortraitAsset(slot.character, slot.mood, "bright");
+  const src = getPortraitAsset(
+    slot.character,
+    slot.mood,
+    "bright",
+    slot.variant ?? "default",
+  );
   const isBright = slot.light === "bright";
   const tone = portraitToneByCharacter[slot.character];
   const entrance = slot.entrance ?? "static";

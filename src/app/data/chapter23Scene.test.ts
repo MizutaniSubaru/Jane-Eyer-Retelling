@@ -129,11 +129,29 @@ describe("chapter23Scene", () => {
     });
     expect(rochesterBeat?.stage).toMatchObject({
       mode: "duo-stage",
-      right: { character: "rochester", visible: true, entrance: "slide-in-right" },
+      right: {
+        character: "rochester",
+        visible: true,
+        entrance: "fade-in",
+        variant: "back",
+      },
     });
     expect(rochesterFollowUp?.stage).toMatchObject({
       mode: "duo-stage",
-      right: { character: "rochester", visible: true, entrance: "static" },
+      right: {
+        character: "rochester",
+        visible: true,
+        entrance: "static",
+        variant: "back",
+      },
+    });
+
+    const rochesterFirstLine = chapter23Scene.find(
+      (entry) => entry.id === "rochester-calls-jane-to-moth",
+    );
+    expect(rochesterFirstLine?.stage).toMatchObject({
+      mode: "duo-stage",
+      right: { character: "rochester", variant: "default" },
     });
   });
 

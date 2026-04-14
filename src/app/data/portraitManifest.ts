@@ -6,6 +6,7 @@ import janeDimNeutral from "../../assets/portraits/jane-dim-neutral.png";
 import janeDimSad from "../../assets/portraits/jane-dim-sad.png";
 import janeDimWarm from "../../assets/portraits/jane-dim-warm.png";
 import rochesterBrightAngry from "../../assets/portraits/rochester-bright-angry.png";
+import rochesterBack from "../../assets/portraits/rochester-back.png";
 import rochesterBrightNeutral from "../../assets/portraits/rochester-bright-neutral.png";
 import rochesterBrightSad from "../../assets/portraits/rochester-bright-sad.png";
 import rochesterDimAngry from "../../assets/portraits/rochester-dim-angry.png";
@@ -15,6 +16,7 @@ import type {
   CharacterId,
   PortraitLight,
   PortraitMood,
+  PortraitVariant,
 } from "../types/story";
 
 const portraitManifest = {
@@ -44,7 +46,12 @@ export function getPortraitAsset(
   character: CharacterId,
   mood: PortraitMood,
   light: PortraitLight,
+  variant: PortraitVariant = "default",
 ) {
+  if (character === "rochester" && variant === "back") {
+    return rochesterBack;
+  }
+
   return (
     portraitManifest[character][mood]?.[light] ??
     portraitManifest[character].neutral[light]

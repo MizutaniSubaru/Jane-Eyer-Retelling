@@ -184,7 +184,8 @@ describe("CharacterStage", () => {
             mood: "neutral",
             light: "dim",
             visible: true,
-            entrance: "slide-in-right",
+            entrance: "fade-in",
+            variant: "back" as never,
           },
         }}
       />,
@@ -192,7 +193,11 @@ describe("CharacterStage", () => {
 
     expect(screen.getByTestId("portrait-shell-rochester")).toHaveAttribute(
       "data-entrance",
-      "slide-in-right",
+      "fade-in",
+    );
+    expect(screen.getByTestId("portrait-rochester")).toHaveAttribute(
+      "src",
+      expect.stringMatching(/rochester-back\.png$/),
     );
   });
 });

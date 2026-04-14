@@ -8,6 +8,7 @@ export type CharacterId = "jane" | "rochester";
 export type PortraitMood = "neutral" | "sad" | "angry" | "warm";
 export type PortraitLight = "bright" | "dim";
 export type PortraitEntrance = "static" | "fade-in" | "slide-in-right";
+export type PortraitVariant = "default" | "back";
 
 export type StageSlot = {
   character: CharacterId;
@@ -15,6 +16,7 @@ export type StageSlot = {
   light: PortraitLight;
   visible?: boolean;
   entrance?: PortraitEntrance;
+  variant?: PortraitVariant;
 };
 
 export type CardStageState = {

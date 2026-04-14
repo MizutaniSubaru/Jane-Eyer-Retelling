@@ -76,7 +76,7 @@ describe("GameScreen", () => {
     );
   });
 
-  it("marks Rochester's orchard entrance beat with the right-edge slide-in animation", () => {
+  it("shows Rochester's back portrait before his first line and switches to the default bright portrait when he speaks", () => {
     render(<GameScreen onBack={vi.fn()} />);
 
     for (let step = 0; step < 10; step += 1) {
@@ -90,7 +90,25 @@ describe("GameScreen", () => {
     expect(screen.getByTestId("portrait-rochester")).toBeInTheDocument();
     expect(screen.getByTestId("portrait-shell-rochester")).toHaveAttribute(
       "data-entrance",
-      "slide-in-right",
+      "fade-in",
+    );
+    expect(screen.getByTestId("portrait-rochester")).toHaveAttribute(
+      "src",
+      expect.stringMatching(/rochester-back\.png$/),
+    );
+
+    for (let step = 0; step < 4; step += 1) {
+      fireEvent.click(screen.getByTestId("dialogue-box"));
+    }
+
+    expect(screen.getByText("简，过来看看这家伙。")).toBeInTheDocument();
+    expect(screen.getByTestId("portrait-rochester")).toHaveAttribute(
+      "src",
+      expect.stringMatching(/rochester-bright-neutral\.png$/),
+    );
+    expect(screen.getByTestId("portrait-rochester")).toHaveAttribute(
+      "data-light",
+      "bright",
     );
   });
 

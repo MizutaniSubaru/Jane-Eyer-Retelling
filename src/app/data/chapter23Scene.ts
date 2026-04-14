@@ -172,7 +172,7 @@ export const chapter23Scene: SceneEntry[] = [
     text:
       "她正要去边门，却看见罗切斯特先生先一步跨了进来，只得躲进常春藤遮蔽的暗影里，希望他很快便会折返。",
     stage: calmDuoStage("none", {
-      right: { visible: true, entrance: "slide-in-right" },
+      right: { visible: true, entrance: "fade-in", variant: "back" },
     }),
     atmosphere: calmAtmosphere,
   },
@@ -182,7 +182,9 @@ export const chapter23Scene: SceneEntry[] = [
     speaker: "旁白",
     text:
       "可他没有离开，只在暮色中慢慢流连，看看沉甸甸的果树，摘一颗樱桃，又俯身去看落在花枝上的大飞蛾。",
-    stage: calmDuoStage("none"),
+    stage: calmDuoStage("none", {
+      right: { visible: true, entrance: "static", variant: "back" },
+    }),
     atmosphere: calmAtmosphere,
   },
   {
@@ -190,7 +192,9 @@ export const chapter23Scene: SceneEntry[] = [
     type: "thought",
     speaker: "简·爱",
     text: "现在他背对着我，只要我脚步够轻，也许就能悄悄溜走。",
-    stage: calmDuoStage("none"),
+    stage: calmDuoStage("none", {
+      right: { visible: true, entrance: "static", variant: "back" },
+    }),
     atmosphere: calmAtmosphere,
   },
   {
@@ -199,7 +203,9 @@ export const chapter23Scene: SceneEntry[] = [
     speaker: "旁白",
     text:
       "简踩上小径边的草皮，免得石子发出声响。就在她要跨过他被月光拉长的影子时，低沉的声音忽然响了起来。",
-    stage: duoStage("neutral", "neutral", "none"),
+    stage: duoStage("neutral", "neutral", "none", {
+      right: { variant: "back" },
+    }),
     atmosphere: calmAtmosphere,
   },
   {
@@ -207,7 +213,9 @@ export const chapter23Scene: SceneEntry[] = [
     type: "dialogue",
     speaker: "罗切斯特",
     text: "简，过来看看这家伙。",
-    stage: duoStage("neutral", "neutral", "rochester"),
+    stage: duoStage("neutral", "neutral", "rochester", {
+      right: { variant: "default" },
+    }),
     atmosphere: calmAtmosphere,
   },
   {
