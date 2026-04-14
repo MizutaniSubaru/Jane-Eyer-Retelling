@@ -83,7 +83,7 @@ export function GameScreen({
         onClick={handleNext}
         className="absolute inset-0 z-10 cursor-pointer px-4 pt-24 md:pt-28"
       >
-        <CharacterStage stage={resolvedStage} sceneKey={currentEntry.id} />
+        <CharacterStage stage={resolvedStage} />
       </div>
 
       {/* Weather / Emotion Overlay */}
