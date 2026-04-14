@@ -1,10 +1,8 @@
 import janeBrightAngry from "../../assets/portraits/jane-bright-angry.png";
 import janeBrightNeutral from "../../assets/portraits/jane-bright-neutral.png";
 import janeBrightSad from "../../assets/portraits/jane-bright-sad.png";
-import janeBrightWarm from "../../assets/portraits/jane-bright-warm.png";
 import janeDimNeutral from "../../assets/portraits/jane-dim-neutral.png";
 import janeDimSad from "../../assets/portraits/jane-dim-sad.png";
-import janeDimWarm from "../../assets/portraits/jane-dim-warm.png";
 import rochesterBrightAngry from "../../assets/portraits/rochester-bright-angry.png";
 import rochesterBack from "../../assets/portraits/rochester-back.png";
 import rochesterBrightNeutral from "../../assets/portraits/rochester-bright-neutral.png";
@@ -28,7 +26,11 @@ const portraitManifest = {
       // Intentional alias: there is no dedicated Jane dim-angry portrait yet.
       dim: janeDimNeutral,
     },
-    warm: { bright: janeBrightWarm, dim: janeDimWarm },
+    warm: {
+      // Intentional alias: smiling art is disabled, so warm falls back to neutral.
+      bright: janeBrightNeutral,
+      dim: janeDimNeutral,
+    },
   },
   rochester: {
     neutral: { bright: rochesterBrightNeutral, dim: rochesterDimNeutral },

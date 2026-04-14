@@ -11,6 +11,7 @@ function clampVolume(volume: number) {
 export function createBackgroundMusicController(audio: HTMLAudioElement) {
   let fadeTimer: number | null = null;
   let pendingPlaybackRetryCleanup: (() => void) | null = null;
+  let playbackAttemptId = 0;
 
   const clearFade = () => {
     if (fadeTimer !== null) {
@@ -58,26 +59,38 @@ export function createBackgroundMusicController(audio: HTMLAudioElement) {
     }
 
     const retryPlayback = () => {
-      clearPendingPlaybackRetry();
       void startFadeInPlayback();
     };
 
-    const playbackRetryEvents = ["click", "keydown", "pointerdown", "touchstart"] as const;
+    const playbackRetryEvents = [
+      "click",
+      "keydown",
+      "pointerdown",
+      "touchstart",
+      "touchend",
+      "mouseup",
+    ] as const;
 
     playbackRetryEvents.forEach((eventName) => {
-      window.addEventListener(eventName, retryPlayback, { once: true });
+      window.addEventListener(eventName, retryPlayback, {
+        capture: true,
+        once: true,
+      });
     });
 
     pendingPlaybackRetryCleanup = () => {
       playbackRetryEvents.forEach((eventName) => {
-        window.removeEventListener(eventName, retryPlayback);
+        window.removeEventListener(eventName, retryPlayback, true);
       });
     };
   };
 
   const startFadeInPlayback = async () => {
+    const attemptId = playbackAttemptId + 1;
+    playbackAttemptId = attemptId;
+
     clearFade();
-    clearPendingPlaybackRetry();
+    armPlaybackRetry();
     audio.loop = true;
     audio.currentTime = 0;
     audio.volume = 0;
@@ -85,10 +98,17 @@ export function createBackgroundMusicController(audio: HTMLAudioElement) {
     try {
       await audio.play();
     } catch {
-      armPlaybackRetry();
+      if (attemptId !== playbackAttemptId) {
+        return;
+      }
       return;
     }
 
+    if (attemptId !== playbackAttemptId) {
+      return;
+    }
+
+    clearPendingPlaybackRetry();
     fadeVolume(0, BGM_TARGET_VOLUME, BGM_FADE_IN_MS);
   };
 

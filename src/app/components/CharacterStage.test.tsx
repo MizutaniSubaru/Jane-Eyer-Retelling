@@ -200,4 +200,124 @@ describe("CharacterStage", () => {
       expect.stringMatching(/rochester-back\.png$/),
     );
   });
+
+  it("crossfades Rochester from the back portrait to the front portrait when he starts speaking", () => {
+    const { rerender } = render(
+      <CharacterStage
+        sceneKey="jane-steps-over-grass"
+        stage={{
+          mode: "duo-stage",
+          left: {
+            character: "jane",
+            mood: "neutral",
+            light: "dim",
+            visible: true,
+            entrance: "static",
+          },
+          right: {
+            character: "rochester",
+            mood: "neutral",
+            light: "dim",
+            visible: true,
+            entrance: "static",
+            variant: "back" as never,
+          },
+        }}
+      />,
+    );
+
+    rerender(
+      <CharacterStage
+        sceneKey="rochester-calls-jane-to-moth"
+        stage={{
+          mode: "duo-stage",
+          left: {
+            character: "jane",
+            mood: "neutral",
+            light: "dim",
+            visible: true,
+            entrance: "static",
+          },
+          right: {
+            character: "rochester",
+            mood: "neutral",
+            light: "bright",
+            visible: true,
+            entrance: "fade-in",
+            variant: "default" as never,
+          },
+        }}
+      />,
+    );
+
+    const rochesterShells = screen.getAllByTestId("portrait-shell-rochester");
+
+    expect(rochesterShells).toHaveLength(2);
+    expect(
+      rochesterShells.map((shell) => shell.getAttribute("data-variant")).sort(),
+    ).toEqual(["back", "default"]);
+    expect(
+      rochesterShells.find((shell) => shell.getAttribute("data-variant") === "back"),
+    ).toHaveAttribute("data-exit", "fade-out");
+    expect(
+      rochesterShells.find((shell) => shell.getAttribute("data-variant") === "default"),
+    ).toHaveAttribute("data-entrance", "fade-in");
+  });
+
+  it("restores Rochester's front portrait to full opacity if the scene advances before fade-in completes", () => {
+    const { rerender } = render(
+      <CharacterStage
+        sceneKey="rochester-calls-jane-to-moth"
+        stage={{
+          mode: "duo-stage",
+          left: {
+            character: "jane",
+            mood: "neutral",
+            light: "dim",
+            visible: true,
+            entrance: "static",
+          },
+          right: {
+            character: "rochester",
+            mood: "neutral",
+            light: "bright",
+            visible: true,
+            entrance: "fade-in",
+            variant: "default" as never,
+          },
+        }}
+      />,
+    );
+
+    rerender(
+      <CharacterStage
+        sceneKey="jane-startled-by-being-seen"
+        stage={{
+          mode: "duo-stage",
+          left: {
+            character: "jane",
+            mood: "neutral",
+            light: "bright",
+            visible: true,
+            entrance: "static",
+          },
+          right: {
+            character: "rochester",
+            mood: "neutral",
+            light: "dim",
+            visible: true,
+            entrance: "static",
+            variant: "default" as never,
+          },
+        }}
+      />,
+    );
+
+    const currentFrontShell = screen
+      .getAllByTestId("portrait-shell-rochester")
+      .find((shell) => shell.getAttribute("data-variant") === "default");
+
+    expect(currentFrontShell).toHaveAttribute("data-entrance", "static");
+    expect(currentFrontShell).toHaveStyle({ opacity: "1" });
+  });
 });

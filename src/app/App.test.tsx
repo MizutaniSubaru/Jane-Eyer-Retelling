@@ -151,6 +151,28 @@ describe("App", () => {
     expect(audioInstances[0].volume).toBeCloseTo(BGM_TARGET_VOLUME, 2);
   });
 
+  it("retries playback when the first user gesture happens before the autoplay rejection settles", async () => {
+    createPlayMock = () =>
+      vi
+        .fn()
+        .mockRejectedValueOnce(new Error("NotAllowedError"))
+        .mockResolvedValue(undefined);
+
+    render(<App />);
+
+    fireEvent.click(screen.getByRole("button", { name: "开始叙事" }));
+    await act(async () => {});
+
+    expect(audioInstances).toHaveLength(1);
+    expect(audioInstances[0].play).toHaveBeenCalledTimes(2);
+
+    act(() => {
+      vi.advanceTimersByTime(BGM_FADE_IN_MS);
+    });
+
+    expect(audioInstances[0].volume).toBeCloseTo(BGM_TARGET_VOLUME, 2);
+  });
+
   it("fades the music out and stops playback when the story reaches its ending", async () => {
     render(<App />);
     await act(async () => {});

@@ -23,7 +23,13 @@ describe("getPortraitAsset", () => {
     );
   });
 
-  it("falls back to neutral when a warm portrait is unavailable", () => {
+  it("uses the neutral portraits for warm mood so smiling art never renders", () => {
+    expect(getPortraitAsset("jane", "warm", "bright")).toMatch(
+      /jane-bright-neutral\.png$/,
+    );
+    expect(getPortraitAsset("jane", "warm", "dim")).toMatch(
+      /jane-dim-neutral\.png$/,
+    );
     expect(getPortraitAsset("rochester", "warm", "bright")).toMatch(
       /rochester-bright-neutral\.png$/,
     );
@@ -37,7 +43,7 @@ describe("getPortraitAsset", () => {
       expect.stringMatching(/jane-bright-neutral\.png$/),
     );
     expect(getPortraitAsset("jane", "warm", "dim")).toEqual(
-      expect.stringMatching(/jane-dim-warm\.png$/),
+      expect.stringMatching(/jane-dim-neutral\.png$/),
     );
     expect(getPortraitAsset("rochester", "angry", "bright")).toEqual(
       expect.stringMatching(/rochester-bright-angry\.png$/),

@@ -1,4 +1,4 @@
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { getPortraitAsset } from "../data/portraitManifest";
 import type {
   CharacterId,
@@ -55,7 +55,11 @@ function getPortraitTransition(entrance: PortraitEntrance) {
   }
 }
 
-function Portrait({ slot, align, sceneKey = "static" }: PortraitProps) {
+function getPortraitExit() {
+  return { opacity: 0 } as const;
+}
+
+function Portrait({ slot, align }: PortraitProps) {
   if (slot.visible === false) {
     return null;
   }
@@ -71,21 +75,20 @@ function Portrait({ slot, align, sceneKey = "static" }: PortraitProps) {
   const entrance = slot.entrance ?? "static";
   const initial = getPortraitInitial(align, entrance);
   const transition = getPortraitTransition(entrance);
-  const animationProps =
-    entrance === "static"
-      ? {}
-      : {
-          initial,
-          animate: { opacity: 1, x: 0 },
-          transition,
-        };
+  const animationProps = {
+    initial,
+    animate: { opacity: 1, x: 0 },
+    transition,
+  };
 
   return (
     <motion.div
-      key={`${sceneKey}:${slot.character}:${entrance}`}
       data-testid={`portrait-shell-${slot.character}`}
       data-entrance={entrance}
+      data-exit="fade-out"
+      data-variant={slot.variant ?? "default"}
       className={`absolute bottom-0 ${align === "left" ? "left-[2%] md:left-[8%]" : "right-[2%] md:right-[8%]"} flex items-end`}
+      exit={getPortraitExit()}
       {...animationProps}
     >
       <div className="relative">
@@ -109,7 +112,7 @@ function Portrait({ slot, align, sceneKey = "static" }: PortraitProps) {
 
 export function CharacterStage({
   stage,
-  sceneKey,
+  sceneKey: _sceneKey,
 }: {
   stage: StageState;
   sceneKey?: string;
@@ -124,8 +127,24 @@ export function CharacterStage({
       data-testid="character-stage-layer"
       className="pointer-events-none relative h-full w-full overflow-hidden"
     >
-      <Portrait slot={stage.left} align="left" sceneKey={sceneKey} />
-      <Portrait slot={stage.right} align="right" sceneKey={sceneKey} />
+      <AnimatePresence initial={false}>
+        {stage.left.visible !== false && (
+          <Portrait
+            key={`left:${stage.left.character}:${stage.left.variant ?? "default"}`}
+            slot={stage.left}
+            align="left"
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence initial={false}>
+        {stage.right.visible !== false && (
+          <Portrait
+            key={`right:${stage.right.character}:${stage.right.variant ?? "default"}`}
+            slot={stage.right}
+            align="right"
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

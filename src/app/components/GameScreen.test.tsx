@@ -51,13 +51,23 @@ describe("GameScreen", () => {
 
     expect(screen.getByText("简，过来看看这家伙。")).toBeInTheDocument();
     expect(screen.getByTestId("portrait-jane")).toHaveAttribute("data-light", "dim");
-    expect(screen.getByTestId("portrait-rochester")).toHaveAttribute("data-light", "bright");
+    const speakingRochesterPortrait = screen
+      .getAllByTestId("portrait-rochester")
+      .find((portrait) => portrait.getAttribute("data-light") === "bright");
+    expect(speakingRochesterPortrait).toHaveAttribute("data-light", "bright");
 
     fireEvent.click(screen.getByTestId("game-stage-layer"));
 
     expect(screen.getByText(/我明明没有出声，他怎么还是知道我在这里？/)).toBeInTheDocument();
     expect(screen.getByTestId("portrait-jane")).toHaveAttribute("data-light", "bright");
-    expect(screen.getByTestId("portrait-rochester")).toHaveAttribute("data-light", "dim");
+    const currentRochesterPortrait = screen
+      .getAllByTestId("portrait-rochester")
+      .find(
+        (portrait) =>
+          /rochester-bright-neutral\.png$/.test(portrait.getAttribute("src") ?? "") &&
+          portrait.getAttribute("data-light") === "dim",
+      );
+    expect(currentRochesterPortrait).toHaveAttribute("data-light", "dim");
   });
 
   it("shows Jane alone on the split follow-up beat before Rochester enters", () => {
@@ -102,11 +112,20 @@ describe("GameScreen", () => {
     }
 
     expect(screen.getByText("简，过来看看这家伙。")).toBeInTheDocument();
-    expect(screen.getByTestId("portrait-rochester")).toHaveAttribute(
-      "src",
-      expect.stringMatching(/rochester-bright-neutral\.png$/),
+    const rochesterShells = screen.getAllByTestId("portrait-shell-rochester");
+    const rochesterPortraits = screen.getAllByTestId("portrait-rochester");
+    const frontShell = rochesterShells.find(
+      (shell) => shell.getAttribute("data-variant") === "default",
     );
-    expect(screen.getByTestId("portrait-rochester")).toHaveAttribute(
+    const frontPortrait = rochesterPortraits.find((portrait) =>
+      /rochester-bright-neutral\.png$/.test(portrait.getAttribute("src") ?? ""),
+    );
+
+    expect(frontShell).toHaveAttribute(
+      "data-entrance",
+      "fade-in",
+    );
+    expect(frontPortrait).toHaveAttribute(
       "data-light",
       "bright",
     );

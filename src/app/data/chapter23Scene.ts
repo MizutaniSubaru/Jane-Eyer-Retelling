@@ -214,7 +214,7 @@ export const chapter23Scene: SceneEntry[] = [
     speaker: "罗切斯特",
     text: "简，过来看看这家伙。",
     stage: duoStage("neutral", "neutral", "rochester", {
-      right: { variant: "default" },
+      right: { variant: "default", entrance: "fade-in" },
     }),
     atmosphere: calmAtmosphere,
   },
