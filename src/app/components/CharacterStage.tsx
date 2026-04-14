@@ -1,9 +1,16 @@
+import { motion } from "motion/react";
 import { getPortraitAsset } from "../data/portraitManifest";
-import type { CharacterId, StageSlot, StageState } from "../types/story";
+import type {
+  CharacterId,
+  PortraitEntrance,
+  StageSlot,
+  StageState,
+} from "../types/story";
 
 type PortraitProps = {
   slot: StageSlot;
   align: "left" | "right";
+  sceneKey?: string;
 };
 
 const portraitToneByCharacter: Record<
@@ -26,15 +33,55 @@ const portraitToneByCharacter: Record<
   },
 };
 
-function Portrait({ slot, align }: PortraitProps) {
+function getPortraitInitial(align: "left" | "right", entrance: PortraitEntrance) {
+  switch (entrance) {
+    case "fade-in":
+      return { opacity: 0 };
+    case "slide-in-right":
+      return { opacity: 0, x: align === "right" ? 120 : 0 };
+    default:
+      return false;
+  }
+}
+
+function getPortraitTransition(entrance: PortraitEntrance) {
+  switch (entrance) {
+    case "fade-in":
+      return { duration: 0.75, ease: "easeOut" } as const;
+    case "slide-in-right":
+      return { duration: 0.85, ease: [0.18, 0.84, 0.32, 1] } as const;
+    default:
+      return undefined;
+  }
+}
+
+function Portrait({ slot, align, sceneKey = "static" }: PortraitProps) {
+  if (slot.visible === false) {
+    return null;
+  }
+
   const src = getPortraitAsset(slot.character, slot.mood, "bright");
   const isBright = slot.light === "bright";
   const tone = portraitToneByCharacter[slot.character];
+  const entrance = slot.entrance ?? "static";
+  const initial = getPortraitInitial(align, entrance);
+  const transition = getPortraitTransition(entrance);
+  const animationProps =
+    entrance === "static"
+      ? {}
+      : {
+          initial,
+          animate: { opacity: 1, x: 0 },
+          transition,
+        };
 
   return (
-    <div
+    <motion.div
+      key={`${sceneKey}:${slot.character}:${entrance}`}
       data-testid={`portrait-shell-${slot.character}`}
+      data-entrance={entrance}
       className={`absolute bottom-0 ${align === "left" ? "left-[2%] md:left-[8%]" : "right-[2%] md:right-[8%]"} flex items-end`}
+      {...animationProps}
     >
       <div className="relative">
         {isBright && (
@@ -51,11 +98,17 @@ function Portrait({ slot, align }: PortraitProps) {
           }`}
         />
       </div>
-    </div>
+    </motion.div>
   );
 }
 
-export function CharacterStage({ stage }: { stage: StageState }) {
+export function CharacterStage({
+  stage,
+  sceneKey,
+}: {
+  stage: StageState;
+  sceneKey?: string;
+}) {
   if (stage.mode !== "duo-stage") {
     return null;
   }
@@ -66,8 +119,8 @@ export function CharacterStage({ stage }: { stage: StageState }) {
       data-testid="character-stage-layer"
       className="pointer-events-none relative h-full w-full overflow-hidden"
     >
-      <Portrait slot={stage.left} align="left" />
-      <Portrait slot={stage.right} align="right" />
+      <Portrait slot={stage.left} align="left" sceneKey={sceneKey} />
+      <Portrait slot={stage.right} align="right" sceneKey={sceneKey} />
     </div>
   );
 }

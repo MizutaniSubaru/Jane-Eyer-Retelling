@@ -7,6 +7,7 @@ import type {
   NarrationOnlyStageState,
   PortraitMood,
   SceneEntry,
+  StageSlot,
 } from "../types/story";
 
 const cardStage = { mode: "card" } satisfies CardStageState;
@@ -20,6 +21,10 @@ function duoStage(
   janeMood: PortraitMood,
   rochesterMood: PortraitMood,
   active: CharacterId | "none",
+  overrides?: {
+    left?: Partial<StageSlot>;
+    right?: Partial<StageSlot>;
+  },
 ): DuoStageState {
   return {
     mode: "duo-stage",
@@ -27,13 +32,39 @@ function duoStage(
       character: "jane",
       mood: janeMood,
       light: active === "jane" ? "bright" : "dim",
+      visible: true,
+      entrance: "static",
+      ...overrides?.left,
     },
     right: {
       character: "rochester",
       mood: rochesterMood,
       light: active === "rochester" ? "bright" : "dim",
+      visible: true,
+      entrance: "static",
+      ...overrides?.right,
     },
   };
+}
+
+function janeSoloStage(
+  janeMood: PortraitMood,
+  entrance: StageSlot["entrance"] = "static",
+): DuoStageState {
+  return duoStage(janeMood, "neutral", "jane", {
+    left: { visible: true, entrance },
+    right: { visible: false, entrance: "static" },
+  });
+}
+
+function calmDuoStage(
+  active: CharacterId | "none",
+  overrides?: {
+    left?: Partial<StageSlot>;
+    right?: Partial<StageSlot>;
+  },
+): DuoStageState {
+  return duoStage("neutral", "neutral", active, overrides);
 }
 
 export const chapter23Meta: ChapterMeta = {
@@ -69,9 +100,16 @@ export const chapter23Scene: SceneEntry[] = [
     id: "adele-sleeps-early",
     type: "narration",
     speaker: "旁白",
-    text:
-      "施洗约翰节前夜，阿黛拉采了半天野草莓，太阳还没落山就累得睡着了。简看她睡稳后，才独自走向花园。",
+    text: "施洗约翰节前夜，阿黛拉采了半天野草莓，太阳还没落山就累得睡着了。",
     stage: narrationStage,
+    atmosphere: calmAtmosphere,
+  },
+  {
+    id: "jane-walks-to-garden-alone",
+    type: "narration",
+    speaker: "旁白",
+    text: "简看她睡稳后，才独自走向花园。",
+    stage: janeSoloStage("neutral", "fade-in"),
     atmosphere: calmAtmosphere,
   },
   {
@@ -80,7 +118,7 @@ export const chapter23Scene: SceneEntry[] = [
     speaker: "旁白",
     text:
       "那正是一昼夜里最温柔的时刻。晚霞褪成辽阔的紫色，东方升起孤星，露水正落向白天晒热的田野。",
-    stage: narrationStage,
+    stage: janeSoloStage("neutral"),
     atmosphere: calmAtmosphere,
   },
   {
@@ -89,7 +127,7 @@ export const chapter23Scene: SceneEntry[] = [
     speaker: "旁白",
     text:
       "简在步道上散了一会儿步，忽然闻到一丝熟悉的雪茄味。她望见书房窗子开着一道缝，便索性走得更远，进了果园。",
-    stage: narrationStage,
+    stage: janeSoloStage("neutral"),
     atmosphere: calmAtmosphere,
   },
   {
@@ -98,7 +136,7 @@ export const chapter23Scene: SceneEntry[] = [
     speaker: "旁白",
     text:
       "果园是宅院里最隐蔽、也最像伊甸园的一角。月桂小径尽头立着高大的七叶树，树根四周围着一圈坐凳，既幽深又安静。",
-    stage: narrationStage,
+    stage: janeSoloStage("neutral"),
     atmosphere: calmAtmosphere,
   },
   {
@@ -107,7 +145,7 @@ export const chapter23Scene: SceneEntry[] = [
     speaker: "旁白",
     text:
       "初升的月亮把银光投向园中空地，简正被月色吸引，却又忽然停住脚步。那股足以令她警觉的气味，再次从暮色里飘了过来。",
-    stage: narrationStage,
+    stage: janeSoloStage("neutral"),
     atmosphere: calmAtmosphere,
   },
   {
@@ -116,7 +154,7 @@ export const chapter23Scene: SceneEntry[] = [
     speaker: "旁白",
     text:
       "香蔷薇、青蒿、茉莉和玫瑰都在吐露晚香，但这一次，简很清楚，那并不是花香，而是罗切斯特先生的雪茄味。",
-    stage: narrationStage,
+    stage: janeSoloStage("neutral"),
     atmosphere: calmAtmosphere,
   },
   {
@@ -124,7 +162,7 @@ export const chapter23Scene: SceneEntry[] = [
     type: "thought",
     speaker: "简·爱",
     text: "我得赶紧躲开。",
-    stage: narrationStage,
+    stage: janeSoloStage("neutral"),
     atmosphere: calmAtmosphere,
   },
   {
@@ -133,7 +171,9 @@ export const chapter23Scene: SceneEntry[] = [
     speaker: "旁白",
     text:
       "她正要去边门，却看见罗切斯特先生先一步跨了进来，只得躲进常春藤遮蔽的暗影里，希望他很快便会折返。",
-    stage: narrationStage,
+    stage: calmDuoStage("none", {
+      right: { visible: true, entrance: "slide-in-right" },
+    }),
     atmosphere: calmAtmosphere,
   },
   {
@@ -142,7 +182,7 @@ export const chapter23Scene: SceneEntry[] = [
     speaker: "旁白",
     text:
       "可他没有离开，只在暮色中慢慢流连，看看沉甸甸的果树，摘一颗樱桃，又俯身去看落在花枝上的大飞蛾。",
-    stage: narrationStage,
+    stage: calmDuoStage("none"),
     atmosphere: calmAtmosphere,
   },
   {
@@ -150,7 +190,7 @@ export const chapter23Scene: SceneEntry[] = [
     type: "thought",
     speaker: "简·爱",
     text: "现在他背对着我，只要我脚步够轻，也许就能悄悄溜走。",
-    stage: narrationStage,
+    stage: calmDuoStage("none"),
     atmosphere: calmAtmosphere,
   },
   {

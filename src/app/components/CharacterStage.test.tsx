@@ -135,4 +135,64 @@ describe("CharacterStage", () => {
     expect(screen.queryByTestId("portrait-rochester")).not.toBeInTheDocument();
     expect(container.firstChild).toBeNull();
   });
+
+  it("omits hidden portrait slots from the DOM", () => {
+    render(
+      <CharacterStage
+        sceneKey="jane-walks-to-garden-alone"
+        stage={{
+          mode: "duo-stage",
+          left: {
+            character: "jane",
+            mood: "neutral",
+            light: "bright",
+            visible: true,
+            entrance: "fade-in",
+          },
+          right: {
+            character: "rochester",
+            mood: "neutral",
+            light: "dim",
+            visible: false,
+            entrance: "static",
+          },
+        }}
+      />,
+    );
+
+    expect(screen.getByTestId("portrait-shell-jane")).toHaveAttribute("data-entrance", "fade-in");
+    expect(screen.getByTestId("portrait-jane")).toHaveAttribute("data-light", "bright");
+    expect(screen.queryByTestId("portrait-shell-rochester")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("portrait-rochester")).not.toBeInTheDocument();
+  });
+
+  it("annotates right-side slide-in entrances on Rochester's shell", () => {
+    render(
+      <CharacterStage
+        sceneKey="rochester-enters-orchard"
+        stage={{
+          mode: "duo-stage",
+          left: {
+            character: "jane",
+            mood: "neutral",
+            light: "dim",
+            visible: true,
+            entrance: "static",
+          },
+          right: {
+            character: "rochester",
+            mood: "neutral",
+            light: "dim",
+            visible: true,
+            entrance: "slide-in-right",
+          },
+        }}
+      />,
+    );
+
+    expect(screen.getByTestId("portrait-shell-rochester")).toHaveAttribute(
+      "data-entrance",
+      "slide-in-right",
+    );
+  });
 });

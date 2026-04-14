@@ -1,4 +1,10 @@
-import type { CharacterId, DuoStageState, SceneEntry, StageState } from "../types/story";
+import type {
+  CharacterId,
+  DuoStageState,
+  SceneEntry,
+  StageSlot,
+  StageState,
+} from "../types/story";
 
 const mapSpeakerToCharacter = (speaker: string): CharacterId | null => {
   switch (speaker) {
@@ -18,6 +24,11 @@ const dimBoth = (stage: DuoStageState): DuoStageState => ({
   left: { ...stage.left, light: "dim" },
   right: { ...stage.right, light: "dim" },
 });
+
+const isVisible = (slot: StageSlot) => slot.visible !== false;
+
+const visibleSlotCount = (stage: DuoStageState) =>
+  Number(isVisible(stage.left)) + Number(isVisible(stage.right));
 
 const applyHighlight = (
   stage: DuoStageState,
@@ -75,7 +86,11 @@ export const resolveStagePresentation = (
     return current.stage;
   }
 
-  if (current.type === "dialogue") {
+  if (visibleSlotCount(current.stage) <= 1) {
+    return current.stage;
+  }
+
+  if (current.type === "dialogue" || current.type === "thought") {
     return applyHighlight(current.stage, mapSpeakerToCharacter(current.speaker));
   }
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
 import { chapter23Meta, chapter23Scene } from "../data/chapter23Scene";
@@ -9,11 +9,25 @@ import { TopBar } from "./TopBar";
 import { DialogueBox } from "./DialogueBox";
 import bgImg from "../../imports/4164942f3bb1b952ba1877846b4d95a5.png";
 
-export function GameScreen({ onBack }: { onBack: () => void }) {
+export function GameScreen({
+  onBack,
+  onStoryEnd,
+}: {
+  onBack: () => void;
+  onStoryEnd?: () => void;
+}) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const hasAnnouncedEnding = useRef(false);
   const currentEntry = chapter23Scene[currentIndex];
   const resolvedStage = resolveStagePresentation(chapter23Scene, currentIndex);
   const progress = (currentIndex / (chapter23Scene.length - 1)) * 100;
+
+  useEffect(() => {
+    if (currentIndex === chapter23Scene.length - 1 && !hasAnnouncedEnding.current) {
+      hasAnnouncedEnding.current = true;
+      onStoryEnd?.();
+    }
+  }, [currentIndex, onStoryEnd]);
 
   const handleNext = () => {
     if (currentIndex < chapter23Scene.length - 1) {
@@ -69,7 +83,7 @@ export function GameScreen({ onBack }: { onBack: () => void }) {
         onClick={handleNext}
         className="absolute inset-0 z-10 cursor-pointer px-4 pt-24 md:pt-28"
       >
-        <CharacterStage stage={resolvedStage} />
+        <CharacterStage stage={resolvedStage} sceneKey={currentEntry.id} />
       </div>
 
       {/* Weather / Emotion Overlay */}

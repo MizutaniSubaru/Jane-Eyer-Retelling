@@ -42,6 +42,31 @@ const narrationAfterDialogue: SceneEntry = {
   },
 };
 
+const soloVisibleJaneBeat: SceneEntry = {
+  id: "jane-walks-to-garden-alone",
+  type: "narration",
+  speaker: "旁白",
+  text: "简看她睡稳后，才独自走向花园。",
+  atmosphere: { weather: "calm" },
+  stage: {
+    mode: "duo-stage",
+    left: {
+      character: "jane",
+      mood: "neutral",
+      light: "bright",
+      visible: true,
+      entrance: "fade-in",
+    },
+    right: {
+      character: "rochester",
+      mood: "neutral",
+      light: "dim",
+      visible: false,
+      entrance: "static",
+    },
+  },
+};
+
 const unmappedDialogueStage: SceneEntry = {
   id: "mrs-fairfax-speaks",
   type: "dialogue",
@@ -68,7 +93,7 @@ describe("resolveStagePresentation", () => {
     expect(resolved.right.light).toBe("bright");
   });
 
-  it("inherits the previous dialogue highlight for thought and narration beats", () => {
+  it("highlights the current thinker for duo-stage thought beats", () => {
     const resolved = resolveStagePresentation(
       [rochesterDialogueStage, thoughtAfterDialogue],
       1,
@@ -79,8 +104,8 @@ describe("resolveStagePresentation", () => {
       throw new Error("Expected a duo-stage result.");
     }
 
-    expect(resolved.left.light).toBe("dim");
-    expect(resolved.right.light).toBe("bright");
+    expect(resolved.left.light).toBe("bright");
+    expect(resolved.right.light).toBe("dim");
   });
 
   it("inherits the immediately previous dialogue highlight for duo-stage narration", () => {
@@ -98,7 +123,7 @@ describe("resolveStagePresentation", () => {
     expect(resolved.right.light).toBe("bright");
   });
 
-  it("falls back to both dim when the nearest prior duo-stage dialogue speaker is unmapped", () => {
+  it("still highlights the thinker even when the nearest prior dialogue speaker is unmapped", () => {
     const resolved = resolveStagePresentation(
       [rochesterDialogueStage, unmappedDialogueStage, thoughtAfterDialogue],
       2,
@@ -109,11 +134,11 @@ describe("resolveStagePresentation", () => {
       throw new Error("Expected a duo-stage result.");
     }
 
-    expect(resolved.left.light).toBe("dim");
+    expect(resolved.left.light).toBe("bright");
     expect(resolved.right.light).toBe("dim");
   });
 
-  it("stops highlight inheritance when a non-duo-stage beat breaks the stage sequence", () => {
+  it("still highlights the thinker when a non-duo-stage beat breaks the prior stage sequence", () => {
     const narrationOnlyBreak: SceneEntry = {
       id: "garden-break",
       type: "narration",
@@ -133,11 +158,11 @@ describe("resolveStagePresentation", () => {
       throw new Error("Expected a duo-stage result.");
     }
 
-    expect(resolved.left.light).toBe("dim");
+    expect(resolved.left.light).toBe("bright");
     expect(resolved.right.light).toBe("dim");
   });
 
-  it("falls back to both portraits dim when no prior dialogue highlight exists", () => {
+  it("highlights the thinker even when no prior dialogue highlight exists", () => {
     const resolved = resolveStagePresentation([thoughtAfterDialogue], 0);
 
     expect(resolved.mode).toBe("duo-stage");
@@ -145,8 +170,18 @@ describe("resolveStagePresentation", () => {
       throw new Error("Expected a duo-stage result.");
     }
 
-    expect(resolved.left.light).toBe("dim");
+    expect(resolved.left.light).toBe("bright");
     expect(resolved.right.light).toBe("dim");
+  });
+
+  it("keeps the authored light when only one portrait slot is visible", () => {
+    const resolved = resolveStagePresentation([soloVisibleJaneBeat], 0);
+
+    expect(resolved).toMatchObject({
+      mode: "duo-stage",
+      left: { light: "bright", visible: true },
+      right: { visible: false },
+    });
   });
 
   it("returns non-duo stages unchanged", () => {

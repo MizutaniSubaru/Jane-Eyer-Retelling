@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { chapter23Scene } from "../data/chapter23Scene";
 import { GameScreen } from "./GameScreen";
 
 describe("GameScreen", () => {
@@ -41,10 +42,10 @@ describe("GameScreen", () => {
     );
   });
 
-  it("keeps the previous dialogue highlight during subsequent thought beats", () => {
+  it("highlights the thinker during subsequent thought beats", () => {
     render(<GameScreen onBack={vi.fn()} />);
 
-    for (let step = 0; step < 13; step += 1) {
+    for (let step = 0; step < 14; step += 1) {
       fireEvent.click(screen.getByTestId("dialogue-box"));
     }
 
@@ -55,7 +56,58 @@ describe("GameScreen", () => {
     fireEvent.click(screen.getByTestId("game-stage-layer"));
 
     expect(screen.getByText(/我明明没有出声，他怎么还是知道我在这里？/)).toBeInTheDocument();
-    expect(screen.getByTestId("portrait-jane")).toHaveAttribute("data-light", "dim");
-    expect(screen.getByTestId("portrait-rochester")).toHaveAttribute("data-light", "bright");
+    expect(screen.getByTestId("portrait-jane")).toHaveAttribute("data-light", "bright");
+    expect(screen.getByTestId("portrait-rochester")).toHaveAttribute("data-light", "dim");
+  });
+
+  it("shows Jane alone on the split follow-up beat before Rochester enters", () => {
+    render(<GameScreen onBack={vi.fn()} />);
+
+    for (let step = 0; step < 3; step += 1) {
+      fireEvent.click(screen.getByTestId("dialogue-box"));
+    }
+
+    expect(screen.getByText("简看她睡稳后，才独自走向花园。")).toBeInTheDocument();
+    expect(screen.getByTestId("portrait-jane")).toBeInTheDocument();
+    expect(screen.queryByTestId("portrait-rochester")).not.toBeInTheDocument();
+    expect(screen.getByTestId("portrait-shell-jane")).toHaveAttribute(
+      "data-entrance",
+      "fade-in",
+    );
+  });
+
+  it("marks Rochester's orchard entrance beat with the right-edge slide-in animation", () => {
+    render(<GameScreen onBack={vi.fn()} />);
+
+    for (let step = 0; step < 10; step += 1) {
+      fireEvent.click(screen.getByTestId("dialogue-box"));
+    }
+
+    expect(
+      screen.getByText(/她正要去边门，却看见罗切斯特先生先一步跨了进来/),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("portrait-jane")).toBeInTheDocument();
+    expect(screen.getByTestId("portrait-rochester")).toBeInTheDocument();
+    expect(screen.getByTestId("portrait-shell-rochester")).toHaveAttribute(
+      "data-entrance",
+      "slide-in-right",
+    );
+  });
+
+  it("notifies the app when the final line is reached", () => {
+    const onStoryEnd = vi.fn();
+
+    render(<GameScreen onBack={vi.fn()} onStoryEnd={onStoryEnd} />);
+
+    for (let step = 0; step < chapter23Scene.length - 1; step += 1) {
+      fireEvent.click(screen.getByTestId("dialogue-box"));
+    }
+
+    expect(screen.getByText(/大七叶树昨夜遭了雷击/)).toBeInTheDocument();
+    expect(onStoryEnd).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByTestId("dialogue-box"));
+
+    expect(onStoryEnd).toHaveBeenCalledTimes(1);
   });
 });
