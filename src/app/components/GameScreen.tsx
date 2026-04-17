@@ -8,7 +8,7 @@ import { CharacterStage } from "./CharacterStage";
 import { TopBar } from "./TopBar";
 import { DialogueBox } from "./DialogueBox";
 import bgImg from "../../imports/4164942f3bb1b952ba1877846b4d95a5.png";
-import embraceBgImg from "../../../photo_10_2026-04-17_16-46-40.jpg";
+import embraceBgImg from "../../assets/backgrounds/embrace-banner.jpg";
 
 const EMBRACE_BACKGROUND_START_ID = "jane-sees-fairfaxs-look";
 const EMBRACE_BACKGROUND_END_ID = "jane-thinks-she-will-explain-later";

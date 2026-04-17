@@ -154,7 +154,7 @@ describe("GameScreen", () => {
     expect(screen.getByText(/他吻了她，吻了又吻/)).toBeInTheDocument();
     expect(screen.getByTestId("game-embrace-background")).toBeInTheDocument();
     expect(screen.getByTestId("game-embrace-image").getAttribute("style")).toContain(
-      "photo_10_2026-04-17_16-46-40.jpg",
+      "embrace-banner.jpg",
     );
 
     fireEvent.click(screen.getByTestId("dialogue-box"));
