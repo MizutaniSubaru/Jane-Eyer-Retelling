@@ -17,24 +17,27 @@ describe("getPortraitAsset", () => {
     );
   });
 
-  it("uses the neutral dim asset for Jane angry dim", () => {
+  it("uses dedicated angry art for Jane in both light modes", () => {
+    expect(getPortraitAsset("jane", "angry", "bright")).toMatch(
+      /jane-bright-angry\.png$/,
+    );
     expect(getPortraitAsset("jane", "angry", "dim")).toMatch(
-      /jane-dim-neutral\.png$/,
+      /jane-dim-angry\.png$/,
     );
   });
 
-  it("uses the neutral portraits for warm mood so smiling art never renders", () => {
+  it("uses dedicated warm portraits for both characters", () => {
     expect(getPortraitAsset("jane", "warm", "bright")).toMatch(
-      /jane-bright-neutral\.png$/,
+      /jane-bright-warm\.png$/,
     );
     expect(getPortraitAsset("jane", "warm", "dim")).toMatch(
-      /jane-dim-neutral\.png$/,
+      /jane-dim-warm\.png$/,
     );
     expect(getPortraitAsset("rochester", "warm", "bright")).toMatch(
-      /rochester-bright-neutral\.png$/,
+      /rochester-bright-warm\.png$/,
     );
     expect(getPortraitAsset("rochester", "warm", "dim")).toMatch(
-      /rochester-dim-neutral\.png$/,
+      /rochester-dim-warm\.png$/,
     );
   });
 
@@ -43,13 +46,13 @@ describe("getPortraitAsset", () => {
       expect.stringMatching(/jane-bright-neutral\.png$/),
     );
     expect(getPortraitAsset("jane", "warm", "dim")).toEqual(
-      expect.stringMatching(/jane-dim-neutral\.png$/),
+      expect.stringMatching(/jane-dim-warm\.png$/),
     );
     expect(getPortraitAsset("rochester", "angry", "bright")).toEqual(
       expect.stringMatching(/rochester-bright-angry\.png$/),
     );
-    expect(getPortraitAsset("rochester", "neutral", "dim")).toEqual(
-      expect.stringMatching(/rochester-dim-neutral\.png$/),
+    expect(getPortraitAsset("rochester", "warm", "dim")).toEqual(
+      expect.stringMatching(/rochester-dim-warm\.png$/),
     );
   });
 

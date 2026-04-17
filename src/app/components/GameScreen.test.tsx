@@ -1,10 +1,22 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { chapter23Scene } from "../data/chapter23Scene";
 import { GameScreen } from "./GameScreen";
 
 describe("GameScreen", () => {
+  const advanceToEntry = (entryId: string) => {
+    const targetIndex = chapter23Scene.findIndex((entry) => entry.id === entryId);
+
+    if (targetIndex < 0) {
+      throw new Error(`Unknown scene entry: ${entryId}`);
+    }
+
+    for (let step = 0; step < targetIndex; step += 1) {
+      fireEvent.click(screen.getByTestId("dialogue-box"));
+    }
+  };
+
   afterEach(() => {
     cleanup();
   });
@@ -129,6 +141,77 @@ describe("GameScreen", () => {
       "data-light",
       "bright",
     );
+  });
+
+  it("activates the full-screen embrace background only for the kiss-to-thought sequence", () => {
+    render(<GameScreen onBack={vi.fn()} />);
+
+    advanceToEntry("rochester-says-goodnight-dearest");
+    expect(screen.queryByTestId("game-embrace-background")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("dialogue-box"));
+
+    expect(screen.getByText(/他吻了她，吻了又吻/)).toBeInTheDocument();
+    expect(screen.getByTestId("game-embrace-background")).toBeInTheDocument();
+    expect(screen.getByTestId("game-embrace-image").getAttribute("style")).toContain(
+      "photo_10_2026-04-17_16-46-40.jpg",
+    );
+
+    fireEvent.click(screen.getByTestId("dialogue-box"));
+
+    expect(screen.getByText(/下次再解释吧/)).toBeInTheDocument();
+    expect(screen.getByTestId("game-embrace-background")).toBeInTheDocument();
+  });
+
+  it("hides portraits during the embrace banner and restores the storm overlay after it ends", async () => {
+    render(<GameScreen onBack={vi.fn()} />);
+
+    advanceToEntry("jane-sees-fairfaxs-look");
+
+    expect(screen.queryByTestId("portrait-jane")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("portrait-rochester")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("storm-ambient-overlay")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("dialogue-box"));
+    fireEvent.click(screen.getByTestId("dialogue-box"));
+
+    expect(screen.getByText(/回到房里后，她想到费尔法克斯太太会暂时误解/)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByTestId("game-embrace-background")).not.toBeInTheDocument();
+    });
+    expect(screen.getByTestId("storm-ambient-overlay")).toBeInTheDocument();
+  });
+
+  it("uses a corner-to-center light bloom when entering and leaving the embrace banner", () => {
+    render(<GameScreen onBack={vi.fn()} />);
+
+    advanceToEntry("jane-sees-fairfaxs-look");
+
+    expect(
+      screen
+        .getAllByTestId("game-embrace-corner-glow")
+        .some((element) => element.getAttribute("data-direction") === "enter"),
+    ).toBe(true);
+    expect(
+      screen
+        .getAllByTestId("game-embrace-flash")
+        .some((element) => element.getAttribute("data-direction") === "enter"),
+    ).toBe(true);
+
+    fireEvent.click(screen.getByTestId("dialogue-box"));
+    fireEvent.click(screen.getByTestId("dialogue-box"));
+
+    expect(screen.getByText(/回到房里后，她想到费尔法克斯太太会暂时误解/)).toBeInTheDocument();
+    expect(
+      screen
+        .getAllByTestId("game-embrace-corner-glow")
+        .some((element) => element.getAttribute("data-direction") === "exit"),
+    ).toBe(true);
+    expect(
+      screen
+        .getAllByTestId("game-embrace-flash")
+        .some((element) => element.getAttribute("data-direction") === "exit"),
+    ).toBe(true);
   });
 
   it("notifies the app when the final line is reached", () => {

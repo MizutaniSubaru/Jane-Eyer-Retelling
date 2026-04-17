@@ -1,15 +1,20 @@
 import janeBrightAngry from "../../assets/portraits/jane-bright-angry.png";
 import janeBrightNeutral from "../../assets/portraits/jane-bright-neutral.png";
 import janeBrightSad from "../../assets/portraits/jane-bright-sad.png";
+import janeBrightWarm from "../../assets/portraits/jane-bright-warm.png";
+import janeDimAngry from "../../assets/portraits/jane-dim-angry.png";
 import janeDimNeutral from "../../assets/portraits/jane-dim-neutral.png";
 import janeDimSad from "../../assets/portraits/jane-dim-sad.png";
+import janeDimWarm from "../../assets/portraits/jane-dim-warm.png";
 import rochesterBrightAngry from "../../assets/portraits/rochester-bright-angry.png";
 import rochesterBack from "../../assets/portraits/rochester-back.png";
 import rochesterBrightNeutral from "../../assets/portraits/rochester-bright-neutral.png";
 import rochesterBrightSad from "../../assets/portraits/rochester-bright-sad.png";
+import rochesterBrightWarm from "../../assets/portraits/rochester-bright-warm.png";
 import rochesterDimAngry from "../../assets/portraits/rochester-dim-angry.png";
 import rochesterDimNeutral from "../../assets/portraits/rochester-dim-neutral.png";
 import rochesterDimSad from "../../assets/portraits/rochester-dim-sad.png";
+import rochesterDimWarm from "../../assets/portraits/rochester-dim-warm.png";
 import type {
   CharacterId,
   PortraitLight,
@@ -21,26 +26,14 @@ const portraitManifest = {
   jane: {
     neutral: { bright: janeBrightNeutral, dim: janeDimNeutral },
     sad: { bright: janeBrightSad, dim: janeDimSad },
-    angry: {
-      bright: janeBrightAngry,
-      // Intentional alias: there is no dedicated Jane dim-angry portrait yet.
-      dim: janeDimNeutral,
-    },
-    warm: {
-      // Intentional alias: smiling art is disabled, so warm falls back to neutral.
-      bright: janeBrightNeutral,
-      dim: janeDimNeutral,
-    },
+    angry: { bright: janeBrightAngry, dim: janeDimAngry },
+    warm: { bright: janeBrightWarm, dim: janeDimWarm },
   },
   rochester: {
     neutral: { bright: rochesterBrightNeutral, dim: rochesterDimNeutral },
     sad: { bright: rochesterBrightSad, dim: rochesterDimSad },
     angry: { bright: rochesterBrightAngry, dim: rochesterDimAngry },
-    warm: {
-      // Intentional aliases: Rochester warm currently reuses the neutral portraits.
-      bright: rochesterBrightNeutral,
-      dim: rochesterDimNeutral,
-    },
+    warm: { bright: rochesterBrightWarm, dim: rochesterDimWarm },
   },
 } satisfies Record<CharacterId, Record<PortraitMood, Record<PortraitLight, string>>>;
 

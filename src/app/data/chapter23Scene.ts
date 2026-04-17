@@ -675,7 +675,7 @@ export const chapter23Scene: SceneEntry[] = [
     type: "dialogue",
     speaker: "罗切斯特",
     text: "我是在请求你与我终生相伴。做我的另一半，做我最好的伴侣。",
-    stage: duoStage("sad", "warm", "rochester"),
+    stage: duoStage("angry", "warm", "rochester"),
     atmosphere: tenseAtmosphere,
   },
   {
@@ -692,7 +692,7 @@ export const chapter23Scene: SceneEntry[] = [
     speaker: "旁白",
     text:
       "一阵风吹过月桂小径，穿过摇曳的七叶树叶，又飘向远方。夜莺仍旧唱着，简却再一次落下泪来。",
-    stage: duoStage("sad", "sad", "none"),
+    stage: duoStage("sad", "warm", "none"),
     atmosphere: tenseAtmosphere,
   },
   {
@@ -700,7 +700,7 @@ export const chapter23Scene: SceneEntry[] = [
     type: "dialogue",
     speaker: "罗切斯特",
     text: "到我身边来，简。让我们解释一下，彼此谅解吧。",
-    stage: duoStage("sad", "sad", "rochester"),
+    stage: duoStage("sad", "warm", "rochester"),
     atmosphere: tenseAtmosphere,
   },
   {
@@ -708,7 +708,7 @@ export const chapter23Scene: SceneEntry[] = [
     type: "dialogue",
     speaker: "简·爱",
     text: "我再也不会到您身边去了。我既已被迫离开，就不能回头。",
-    stage: duoStage("sad", "sad", "jane"),
+    stage: duoStage("sad", "warm", "jane"),
     atmosphere: tenseAtmosphere,
   },
   {
@@ -724,7 +724,7 @@ export const chapter23Scene: SceneEntry[] = [
     type: "narration",
     speaker: "旁白",
     text: "她仍旧一言不发，只当这是另一重玩笑与试探。",
-    stage: duoStage("sad", "warm", "none"),
+    stage: duoStage("angry", "warm", "none"),
     atmosphere: tenseAtmosphere,
   },
   {
@@ -732,7 +732,7 @@ export const chapter23Scene: SceneEntry[] = [
     type: "dialogue",
     speaker: "罗切斯特",
     text: "我的新娘就在这儿。这里有与我相配的人、我的同类。简，你愿意嫁给我吗？",
-    stage: duoStage("sad", "warm", "rochester"),
+    stage: duoStage("angry", "warm", "rochester"),
     atmosphere: tenseAtmosphere,
   },
   {
@@ -740,7 +740,7 @@ export const chapter23Scene: SceneEntry[] = [
     type: "dialogue",
     speaker: "简·爱",
     text: "我还是怀疑。非常怀疑。完全不相信。",
-    stage: duoStage("sad", "warm", "jane"),
+    stage: duoStage("angry", "warm", "jane"),
     atmosphere: tenseAtmosphere,
   },
   {
@@ -928,7 +928,7 @@ export const chapter23Scene: SceneEntry[] = [
     speaker: "旁白",
     text:
       "她仰头望向天空，刚好看见一道青白闪电劈开云层。尖利的霹雳紧接着炸响，雷声从近处滚过，震得她眼前一阵眩晕。",
-    stage: duoStage("sad", "warm", "none"),
+    stage: duoStage("warm", "warm", "none"),
     atmosphere: stormAtmosphere,
   },
   {
@@ -937,7 +937,7 @@ export const chapter23Scene: SceneEntry[] = [
     speaker: "旁白",
     text:
       "大雨倾盆而下。罗切斯特先生催着简穿过小径和庭院跑回屋里，可等他们跨进门厅时，已经从披肩到发梢都被淋透了。",
-    stage: duoStage("sad", "warm", "none"),
+    stage: duoStage("warm", "warm", "none"),
     atmosphere: stormAtmosphere,
   },
   {

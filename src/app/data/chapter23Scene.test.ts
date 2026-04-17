@@ -58,6 +58,8 @@ acceptsStage({
 } as const);
 
 describe("chapter23Scene", () => {
+  const findEntry = (id: string) => chapter23Scene.find((entry) => entry.id === id);
+
   it("keeps explicit stage and atmosphere metadata on every entry", () => {
     for (const entry of chapter23Scene) {
       expect(entry.stage).toBeDefined();
@@ -167,5 +169,51 @@ describe("chapter23Scene", () => {
   it("uses unique scene entry ids", () => {
     const ids = chapter23Scene.map((entry) => entry.id);
     expect(new Set(ids).size).toBe(chapter23Scene.length);
+  });
+
+  it("keeps Rochester warm through the proposal clarification while Jane moves from anger to belief", () => {
+    expect(findEntry("rochester-asks-her-to-share-life")?.stage).toMatchObject({
+      mode: "duo-stage",
+      left: { mood: "angry" },
+      right: { mood: "warm" },
+    });
+    expect(findEntry("wind-stirs-the-laurel-path")?.stage).toMatchObject({
+      mode: "duo-stage",
+      left: { mood: "sad" },
+      right: { mood: "warm" },
+    });
+    expect(findEntry("rochester-asks-for-understanding")?.stage).toMatchObject({
+      mode: "duo-stage",
+      left: { mood: "sad" },
+      right: { mood: "warm" },
+    });
+    expect(findEntry("jane-thinks-he-mocks-her")?.stage).toMatchObject({
+      mode: "duo-stage",
+      left: { mood: "angry" },
+      right: { mood: "warm" },
+    });
+    expect(findEntry("rochester-explains-blanche-rumor")?.stage).toMatchObject({
+      mode: "duo-stage",
+      left: { mood: "sad" },
+      right: { mood: "warm" },
+    });
+    expect(findEntry("jane-begins-to-believe")?.stage).toMatchObject({
+      mode: "duo-stage",
+      left: { mood: "warm" },
+      right: { mood: "warm" },
+    });
+  });
+
+  it("keeps the post-engagement storm beats emotionally warm instead of dropping Jane back into grief", () => {
+    expect(findEntry("lightning-and-thunder")?.stage).toMatchObject({
+      mode: "duo-stage",
+      left: { mood: "warm" },
+      right: { mood: "warm" },
+    });
+    expect(findEntry("dash-through-rain")?.stage).toMatchObject({
+      mode: "duo-stage",
+      left: { mood: "warm" },
+      right: { mood: "warm" },
+    });
   });
 });

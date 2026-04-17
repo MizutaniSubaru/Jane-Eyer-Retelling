@@ -64,6 +64,27 @@ describe("CharacterStage", () => {
     expect(screen.getByTestId("portrait-jane")).not.toHaveClass("grayscale");
   });
 
+  it("renders dedicated warm portrait art instead of falling back to neutral", () => {
+    render(
+      <CharacterStage
+        stage={{
+          mode: "duo-stage",
+          left: { character: "jane", mood: "warm", light: "bright" },
+          right: { character: "rochester", mood: "warm", light: "bright" },
+        }}
+      />,
+    );
+
+    expect(screen.getByTestId("portrait-jane")).toHaveAttribute(
+      "src",
+      expect.stringMatching(/jane-bright-warm\.png$/),
+    );
+    expect(screen.getByTestId("portrait-rochester")).toHaveAttribute(
+      "src",
+      expect.stringMatching(/rochester-bright-warm\.png$/),
+    );
+  });
+
   it("keeps Rochester on a warmer color grade than Jane", () => {
     render(
       <CharacterStage
