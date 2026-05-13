@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { StartScreen } from "./components/StartScreen";
 import { GameScreen } from "./components/GameScreen";
 import { AnimatePresence, motion } from "motion/react";
-import backgroundMusicUrl from "../../scott-buckley-there-was-a-time(chosic.com).mp3";
+import backgroundMusicUrl from "../assets/background-music.mp3";
 import { createBackgroundMusicController } from "./lib/backgroundMusicController";
 
 export default function App() {

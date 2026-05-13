@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "motion/react";
 
 import { chapter23Meta } from "../data/chapter23Scene";
-import bgImg from "../../imports/4164942f3bb1b952ba1877846b4d95a5.png";
+import bgImg from "../../assets/background.png";
 import { DesignNotes } from "./DesignNotes";
 
 export function StartScreen({ onStart }: { onStart: () => void }) {

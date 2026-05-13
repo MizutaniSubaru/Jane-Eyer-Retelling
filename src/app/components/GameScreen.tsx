@@ -7,7 +7,7 @@ import { formatEntryText } from "../lib/storyText";
 import { CharacterStage } from "./CharacterStage";
 import { TopBar } from "./TopBar";
 import { DialogueBox } from "./DialogueBox";
-import bgImg from "../../imports/4164942f3bb1b952ba1877846b4d95a5.png";
+import bgImg from "../../assets/background.png";
 import embraceBgImg from "../../assets/backgrounds/embrace-banner.jpg";
 
 const EMBRACE_BACKGROUND_START_ID = "jane-sees-fairfaxs-look";
