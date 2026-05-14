@@ -1,54 +1,73 @@
-import { motion } from "motion/react";
-import { ArrowLeft, X, Settings2, Volume2, BookOpen } from "lucide-react";
+import titleJaneEyre from "../../assets/ui/title-jane-eyre.png";
+import chapterBar from "../../assets/ui/chapter-bar.png";
+import buttonLog from "../../assets/ui/button-log.png";
+import buttonAuto from "../../assets/ui/button-auto.png";
+import buttonSkip from "../../assets/ui/button-skip.png";
+import buttonMenu from "../../assets/ui/button-menu.png";
+
+const decorativeButtons: { src: string; label: string }[] = [
+  { src: buttonLog, label: "Log" },
+  { src: buttonAuto, label: "Auto" },
+  { src: buttonSkip, label: "Skip" },
+];
+
+const frameFontFamily = "'Cormorant Garamond', 'Noto Serif SC', serif";
 
 export function TopBar({
   onBack,
-  progress,
   chapterLabel,
 }: {
   onBack: () => void;
-  progress: number;
   chapterLabel: string;
 }) {
   return (
-    <div className="w-full px-8 py-6 flex items-center justify-between text-[#a3b5c6]/80 font-serif">
-      {/* Left Actions */}
-      <div className="flex items-center gap-6">
-        <button
-          onClick={onBack}
-          className="group flex items-center gap-2 hover:text-[#f2efe9] transition-colors duration-500"
+    <div className="w-full px-6 pt-4 md:px-10 md:pt-6 flex items-center justify-between gap-6 select-none">
+      {/* Left cluster — title + chapter bar */}
+      <div className="flex items-center gap-3 md:gap-5">
+        <img
+          src={titleJaneEyre}
+          alt="Jane Eyre"
+          className="h-16 md:h-20 w-auto drop-shadow-[0_4px_12px_rgba(0,0,0,0.55)]"
+          draggable={false}
+        />
+        <div
+          data-testid="chapter-frame"
+          className="inline-flex items-center h-10 md:h-12 px-3 whitespace-nowrap text-[#d6b873] font-serif text-xs md:text-sm tracking-wider drop-shadow-[0_3px_8px_rgba(0,0,0,0.55)]"
+          style={{
+            borderStyle: "solid",
+            borderColor: "transparent",
+            borderWidth: "10px 36px",
+            borderImageSource: `url(${chapterBar})`,
+            borderImageSlice: "10 50 fill",
+            borderImageWidth: "10px 36px",
+            borderImageRepeat: "stretch",
+            background: "transparent",
+            fontFamily: frameFontFamily,
+          }}
         >
-          <ArrowLeft size={18} strokeWidth={1.5} />
-          <span className="text-sm tracking-widest hidden sm:block">返回扉页</span>
-        </button>
-        <button className="hover:text-[#f2efe9] transition-colors duration-500">
-          <X size={20} strokeWidth={1.5} />
-        </button>
-      </div>
-
-      {/* Center Narrative Progress */}
-      <div className="flex flex-col items-center flex-1 mx-16 max-w-sm">
-        <div className="flex items-center gap-4 text-xs tracking-[0.2em] mb-3 text-[#a3b5c6]/60">
-          <BookOpen size={14} strokeWidth={1} />
-          <span>{chapterLabel}</span>
-        </div>
-        <div className="w-full h-[1px] bg-[#a3b5c6]/20 relative overflow-hidden rounded-full">
-          <motion.div
-            className="absolute left-0 top-0 bottom-0 bg-[#a3b5c6]/80"
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 1, ease: "easeInOut" }}
-          />
+          {chapterLabel}
         </div>
       </div>
 
-      {/* Right Settings */}
-      <div className="flex items-center gap-6">
-        <button className="hover:text-[#f2efe9] transition-colors duration-500">
-          <Volume2 size={18} strokeWidth={1.5} />
-        </button>
-        <button className="hover:text-[#f2efe9] transition-colors duration-500">
-          <Settings2 size={18} strokeWidth={1.5} />
+      {/* Right cluster — 4 corner buttons */}
+      <div className="flex items-center gap-2 md:gap-3">
+        {decorativeButtons.map((btn) => (
+          <button
+            key={btn.label}
+            type="button"
+            aria-label={btn.label}
+            className="h-10 md:h-12 transition-transform duration-300 hover:-translate-y-0.5 active:scale-95 drop-shadow-[0_3px_8px_rgba(0,0,0,0.55)]"
+          >
+            <img src={btn.src} alt={btn.label} className="h-full w-auto" draggable={false} />
+          </button>
+        ))}
+        <button
+          type="button"
+          onClick={onBack}
+          aria-label="返回章节目录"
+          className="h-10 md:h-12 transition-transform duration-300 hover:-translate-y-0.5 active:scale-95 drop-shadow-[0_3px_8px_rgba(0,0,0,0.55)]"
+        >
+          <img src={buttonMenu} alt="Menu" className="h-full w-auto" draggable={false} />
         </button>
       </div>
     </div>

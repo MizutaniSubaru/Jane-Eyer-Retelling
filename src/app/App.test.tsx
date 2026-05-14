@@ -7,18 +7,38 @@ import App from "./App";
 
 vi.mock("motion/react", () => ({
   AnimatePresence: ({ children }: { children: ReactNode }) => <>{children}</>,
-  motion: {
-    div: ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
-      <div {...props}>{children}</div>
-    ),
-  },
+  motion: new Proxy(
+    {},
+    {
+      get:
+        () =>
+        ({ children, ...props }: HTMLAttributes<HTMLElement> & { children?: ReactNode }) => (
+          <div {...props}>{children}</div>
+        ),
+    },
+  ),
 }));
 
-vi.mock("./components/StartScreen", () => ({
-  StartScreen: ({ onStart }: { onStart: () => void }) => (
+vi.mock("./components/Bookshelf", () => ({
+  Bookshelf: ({ onSelectBook }: { onSelectBook: (id: string) => void }) => (
     <div>
-      <h1>Jane Eyre</h1>
-      <button onClick={onStart}>开始叙事</button>
+      <h1>Library of Stories</h1>
+      <button onClick={() => onSelectBook("jane-eyre")}>选择简爱</button>
+    </div>
+  ),
+}));
+
+vi.mock("./components/ConstellationDirectory", () => ({
+  ConstellationDirectory: ({
+    onBack,
+    onSelectChapter,
+  }: {
+    onBack: () => void;
+    onSelectChapter: (id: string) => void;
+  }) => (
+    <div>
+      <button onClick={onBack}>返回书架</button>
+      <button onClick={() => onSelectChapter("thornfield")}>选择章节</button>
     </div>
   ),
 }));
@@ -32,7 +52,7 @@ vi.mock("./components/GameScreen", () => ({
     onStoryEnd?: () => void;
   }) => (
     <div>
-      <button onClick={onBack}>返回扉页</button>
+      <button onClick={onBack}>返回章节目录</button>
       <button onClick={() => onStoryEnd?.()}>结束剧情</button>
     </div>
   ),
@@ -50,6 +70,13 @@ type MockAudioInstance = {
 
 const audioInstances: MockAudioInstance[] = [];
 let createPlayMock: () => ReturnType<typeof vi.fn>;
+
+const enterGame = async () => {
+  fireEvent.click(screen.getByRole("button", { name: "选择简爱" }));
+  await act(async () => {});
+  fireEvent.click(screen.getByRole("button", { name: "选择章节" }));
+  await act(async () => {});
+};
 
 describe("App", () => {
   beforeEach(() => {
@@ -82,12 +109,22 @@ describe("App", () => {
     vi.unstubAllGlobals();
   });
 
-  it("starts music on the opening screen and restarts the fade-in after returning home", async () => {
+  it("only plays music after entering the game, and fades it out on leaving", async () => {
     render(<App />);
 
     await act(async () => {});
 
     expect(audioInstances).toHaveLength(1);
+    // No autoplay on the bookshelf or directory.
+    expect(audioInstances[0].play).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "选择简爱" }));
+    await act(async () => {});
+    expect(audioInstances[0].play).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "选择章节" }));
+    await act(async () => {});
+
     expect(audioInstances[0].play).toHaveBeenCalledTimes(1);
     expect(audioInstances[0].loop).toBe(true);
     expect(audioInstances[0].currentTime).toBe(0);
@@ -98,15 +135,29 @@ describe("App", () => {
     });
 
     expect(audioInstances[0].volume).toBeCloseTo(BGM_TARGET_VOLUME, 2);
-    expect(screen.getByRole("heading", { name: "Jane Eyre" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "开始叙事" })).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "开始叙事" }));
+    // Leaving the game fades the music back down to silence.
+    fireEvent.click(screen.getByRole("button", { name: "返回章节目录" }));
     await act(async () => {});
 
+    act(() => {
+      vi.advanceTimersByTime(BGM_FADE_OUT_MS);
+    });
+
+    expect(audioInstances[0].pause).toHaveBeenCalledTimes(1);
+    expect(audioInstances[0].volume).toBe(0);
+  });
+
+  it("re-enters the game and restarts playback from the beginning", async () => {
+    render(<App />);
+    await act(async () => {});
+
+    await enterGame();
     expect(audioInstances[0].play).toHaveBeenCalledTimes(1);
 
-    fireEvent.click(screen.getByRole("button", { name: "返回扉页" }));
+    fireEvent.click(screen.getByRole("button", { name: "返回章节目录" }));
+    await act(async () => {});
+    fireEvent.click(screen.getByRole("button", { name: "选择章节" }));
     await act(async () => {});
 
     expect(audioInstances[0].play).toHaveBeenCalledTimes(2);
@@ -120,7 +171,7 @@ describe("App", () => {
     expect(audioInstances[0].volume).toBeCloseTo(BGM_TARGET_VOLUME, 2);
   });
 
-  it("retries playback on the first user interaction if the browser blocks initial autoplay", async () => {
+  it("retries playback on the next user gesture if the browser blocks the game-entry play", async () => {
     createPlayMock = () =>
       vi
         .fn()
@@ -130,13 +181,13 @@ describe("App", () => {
     render(<App />);
     await act(async () => {});
 
-    expect(audioInstances).toHaveLength(1);
+    await enterGame();
+
     expect(audioInstances[0].play).toHaveBeenCalledTimes(1);
 
     act(() => {
       vi.advanceTimersByTime(BGM_FADE_IN_MS);
     });
-
     expect(audioInstances[0].volume).toBe(0);
 
     fireEvent.click(window);
@@ -151,39 +202,15 @@ describe("App", () => {
     expect(audioInstances[0].volume).toBeCloseTo(BGM_TARGET_VOLUME, 2);
   });
 
-  it("retries playback when the first user gesture happens before the autoplay rejection settles", async () => {
-    createPlayMock = () =>
-      vi
-        .fn()
-        .mockRejectedValueOnce(new Error("NotAllowedError"))
-        .mockResolvedValue(undefined);
-
-    render(<App />);
-
-    fireEvent.click(screen.getByRole("button", { name: "开始叙事" }));
-    await act(async () => {});
-
-    expect(audioInstances).toHaveLength(1);
-    expect(audioInstances[0].play).toHaveBeenCalledTimes(2);
-
-    act(() => {
-      vi.advanceTimersByTime(BGM_FADE_IN_MS);
-    });
-
-    expect(audioInstances[0].volume).toBeCloseTo(BGM_TARGET_VOLUME, 2);
-  });
-
   it("fades the music out and stops playback when the story reaches its ending", async () => {
     render(<App />);
     await act(async () => {});
 
-    expect(audioInstances).toHaveLength(1);
-
+    await enterGame();
     act(() => {
       vi.advanceTimersByTime(BGM_FADE_IN_MS);
     });
 
-    fireEvent.click(screen.getByRole("button", { name: "开始叙事" }));
     fireEvent.click(screen.getByRole("button", { name: "结束剧情" }));
     await act(async () => {});
 

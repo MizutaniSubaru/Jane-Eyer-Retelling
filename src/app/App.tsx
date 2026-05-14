@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { StartScreen } from "./components/StartScreen";
+import { Bookshelf } from "./components/Bookshelf";
+import { ConstellationDirectory } from "./components/ConstellationDirectory";
 import { GameScreen } from "./components/GameScreen";
 import { AnimatePresence, motion } from "motion/react";
 import backgroundMusicUrl from "../assets/background-music.mp3";
 import { createBackgroundMusicController } from "./lib/backgroundMusicController";
 
+type ViewState = "bookshelf" | "directory" | "game";
+
 export default function App() {
-  const [gameState, setGameState] = useState<"start" | "game">("start");
+  const [view, setView] = useState<ViewState>("bookshelf");
   const [hasReachedEnding, setHasReachedEnding] = useState(false);
   const musicControllerRef = useRef<ReturnType<typeof createBackgroundMusicController> | null>(
     null,
@@ -25,11 +28,14 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (gameState === "start") {
+    if (view === "game") {
       setHasReachedEnding(false);
       musicControllerRef.current?.playFromStartWithFadeIn();
+      return () => {
+        musicControllerRef.current?.stopWithFadeOut();
+      };
     }
-  }, [gameState]);
+  }, [view]);
 
   useEffect(() => {
     if (hasReachedEnding) {
@@ -39,21 +45,41 @@ export default function App() {
 
   return (
     <div className="w-screen h-screen overflow-hidden bg-[#1f1b24] text-[#f2efe9] relative selection:bg-[#a3b5c6] selection:text-[#1f1b24]">
-      {/* Global Background Layer */}
       <AnimatePresence mode="wait">
-        {gameState === "start" && (
+        {view === "bookshelf" && (
           <motion.div
-            key="start"
+            key="bookshelf"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 1.5, ease: "easeInOut" } }}
             className="absolute inset-0 z-10"
           >
-            <StartScreen onStart={() => setGameState("game")} />
+            <Bookshelf
+              onSelectBook={(bookId) => {
+                if (bookId === "jane-eyre") {
+                  setView("directory");
+                }
+              }}
+            />
           </motion.div>
         )}
-        
-        {gameState === "game" && (
+
+        {view === "directory" && (
+          <motion.div
+            key="directory"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: { duration: 1.2, ease: "easeInOut" } }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-10"
+          >
+            <ConstellationDirectory
+              onBack={() => setView("bookshelf")}
+              onSelectChapter={() => setView("game")}
+            />
+          </motion.div>
+        )}
+
+        {view === "game" && (
           <motion.div
             key="game"
             initial={{ opacity: 0 }}
@@ -62,7 +88,7 @@ export default function App() {
             className="absolute inset-0 z-10"
           >
             <GameScreen
-              onBack={() => setGameState("start")}
+              onBack={() => setView("directory")}
               onStoryEnd={() => setHasReachedEnding(true)}
             />
           </motion.div>

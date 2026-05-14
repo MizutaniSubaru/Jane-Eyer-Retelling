@@ -24,7 +24,7 @@ describe("GameScreen", () => {
   it("starts on the chapter card and advances into narration without showing choices", () => {
     render(<GameScreen onBack={vi.fn()} />);
 
-    expect(screen.getByText(/第二十三章/)).toBeInTheDocument();
+    expect(screen.getAllByText(/第二十三章/).length).toBeGreaterThan(1);
     expect(screen.getAllByText(/果园之夜/).length).toBeGreaterThan(1);
 
     fireEvent.click(screen.getByTestId("dialogue-box"));
@@ -52,6 +52,12 @@ describe("GameScreen", () => {
       "bottom-0",
       "z-20",
     );
+  });
+
+  it("does not render the route ribbon in the lower-right corner", () => {
+    render(<GameScreen onBack={vi.fn()} />);
+
+    expect(screen.queryByAltText("Route: Rochester")).not.toBeInTheDocument();
   });
 
   it("highlights the thinker during subsequent thought beats", () => {

@@ -52,7 +52,6 @@ export function GameScreen({
   const previousShowEmbraceBackground = useRef(false);
   const currentEntry = chapter23Scene[currentIndex];
   const resolvedStage = resolveStagePresentation(chapter23Scene, currentIndex);
-  const progress = (currentIndex / (chapter23Scene.length - 1)) * 100;
   const showEmbraceBackground = isEmbraceBackgroundActive(currentIndex);
   const renderEmbraceBackground = showEmbraceBackground || isEmbraceBackgroundExiting;
   const showEmbraceHighlight = embraceTransitionDirection !== null;
@@ -265,8 +264,7 @@ export function GameScreen({
       >
         <TopBar
           onBack={onBack}
-          progress={progress}
-          chapterLabel={chapter23Meta.title}
+          chapterLabel={`${chapter23Meta.chapterLabel} · ${chapter23Meta.title}`}
         />
       </motion.div>
 
@@ -328,7 +326,7 @@ export function GameScreen({
         onClick={handleNext}
         className="absolute inset-x-0 bottom-0 z-20 px-4 pb-8 sm:px-6 md:px-8 md:pb-10"
       >
-        <div className="mx-auto w-full max-w-5xl">
+        <div className="mx-auto w-full max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
