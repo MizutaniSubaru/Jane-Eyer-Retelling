@@ -124,8 +124,8 @@ export function ConstellationDirectory({
                   />
                 </div>
 
-                {/* Tooltip */}
-                <div className="absolute top-full mt-4 flex flex-col items-center w-48 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none translate-y-2 group-hover:translate-y-0">
+                {/* Chapter label */}
+                <div className="absolute top-full mt-4 flex flex-col items-center w-48 opacity-100 transition-all duration-300 pointer-events-none">
                   <span className="text-white font-serif text-lg tracking-wide whitespace-nowrap drop-shadow-md">
                     {chapter.title}
                   </span>
